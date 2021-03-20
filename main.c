@@ -1,11 +1,12 @@
 #include <stdio.h>
 
 // Dichiarazione struttura nodo
-struct node {
+typedef struct Node {
   float cost;
-  node near_nodes[];
-};
+  struct Node *near_nodes[];
+} Node;
 
 int main(int argc, char *argv[]) {
+  
   return 0;
 }
