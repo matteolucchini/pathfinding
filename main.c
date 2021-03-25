@@ -26,17 +26,17 @@ void randomCost(Node grid[ROW][COL]){
         grid[i][j].cost = BLOCK_NODE;
       }
     }
+
+    for(int i = 0; i < ROW; i++) {
+      for(int j = 0; j < COL; j++)
+          printf("%.2f ", grid[i][j].cost);
+      printf("\n");
+    }
 }
 
 int main(int argc, char *argv[]) {
   Node grid[ROW][COL];
   srand(time(0));
   randomCost(grid);
-  for(int i = 0; i < ROW; i++) {
-    for(int j = 0; j < COL; j++)
-        printf("%.2f ", grid[i][j].cost);
-    printf("\n");
-  }
-
   return 0;
 }
