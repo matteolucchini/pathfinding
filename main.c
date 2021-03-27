@@ -91,7 +91,7 @@ void addNode(Node *list, Node node, int *counter, int *dim) {
 
 void rmNode(Node *list, Node node, int *rm_index, int *counter) {
   memmove(list, list + *rm_index, (*counter - *rm_index) * sizeof(Node));
-  *counter-=1
+  *counter -= 1;
   // for(int i = 0; i < counter; i++) {
   //   if(i < rm_index)
   //     tmp_list[i] = list[i];
