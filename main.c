@@ -55,26 +55,6 @@ void initNodes(Node grid[ROW][COL]){
     }
 }
 
-/*
-int* getptr(int argc, char *argv[]){
-	int i, dimptr = 1;
-	int* ptr = (int*) malloc(dimptr * sizeof(int));
-
-	for (i = 1; i < argc; i++){
-		if (dimptr < i){
-			dimptr = pow(i,2);
-			ptr = realloc(ptr, dimptr * sizeof(int));
-		}
-		ptr[i-1] = atoi(argv[i]);
-	}
-
-	if (dimptr > i)
-		ptr = realloc(ptr, i * sizeof(int));
-
-	return ptr;
-}
-*/
-
  // aggiunge i nodi in una lista
 void addNode(Node *list, Node node, int *counter, int *dim) {
   *counter += 1;
@@ -89,20 +69,19 @@ void addNode(Node *list, Node node, int *counter, int *dim) {
   //   list = realloc(list, counter * sizeof(Node));
 }
 
+// rimuove i nodi dalla lista
 void rmNode(Node *list, Node node, int *rm_index, int *counter) {
-  memmove(list, list + *rm_index, (*counter - *rm_index) * sizeof(Node));
-  *counter -= 1;
-  // for(int i = 0; i < counter; i++) {
-  //   if(i < rm_index)
-  //     tmp_list[i] = list[i];
-  //   if(i > rm_index)
-  //     tmp_list[i - 1] = list[i];
-  // }
+	Node tmp;
+	tmp = list[*rm_index];
+	list[*rm_index] = list[*counter-1];
+	list[*counter-1] = tmp;
+	*counter-=1;
+	list = realloc(list, *counter * sizeof(Node));
+
 }
 
-float calculateHValue(Node current, Node dest)
-{
   // Return using the distance formula
+float calculateHValue(Node current, Node dest){
   return (float)sqrt(pow(current.x - dest.x, 2) + pow(current.y - dest.y, 2));
 }
 
@@ -135,7 +114,6 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
 
   // add starting node to open list
   addNode(openList, src, &countOpen, &dimOpen);
-  printf("%d", countOpen);
 
   while(countOpen != 0) {
     if(countOpen == 1) {
@@ -152,7 +130,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
         }
       }
     }
-    printf("q --> x: %d, y: %d", q.x, q.y);
+    printf("q --> x: %d, y: %d\n", q.x, q.y);
     if(q.x == dst.x && q.y == dst.y) {
       printf("Percorso migliore trovato.\n");
       printf("Costo: %f\n", f_min);
@@ -162,16 +140,18 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       rmNode(openList, q, &rm_index, &countOpen);
       // print lists
       for(int i = 0; i < countClosed; i++) {
-        printf("OPEN x: %d, y: %d\n", openList[i].x, openList[i].y);
         printf("CLOSED x: %d, y: %d\n", closedList[i].x, closedList[i].y);
       }
+    	for(int i = 0; i < countOpen; i++) {
+        	printf("OPEN x: %d, y: %d\n", openList[i].x, openList[i].y);
+    	}
     }
 
   }
 
 
 
-  free(openList);
+  //free(openList);
   free(closedList);
 }
 
