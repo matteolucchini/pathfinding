@@ -139,12 +139,16 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       addNode(closedList, q, &countClosed, &dimClosed);
       rmNode(openList, q, &rm_index, &countOpen);
       // print lists
-      for(int i = 0; i < countClosed; i++) {
-        printf("CLOSED x: %d, y: %d\n", closedList[i].x, closedList[i].y);
-      }
-    	for(int i = 0; i < countOpen; i++) {
-        	printf("OPEN x: %d, y: %d\n", openList[i].x, openList[i].y);
-    	}
+      if(countClosed != 0)
+        for(int i = 0; i < countClosed; i++)
+          printf("CLOSED x: %d, y: %d\n", closedList[i].x, closedList[i].y);
+      else
+        printf("CLOSED: empty\n");
+      if(countOpen != 0)
+      	for(int i = 0; i < countOpen; i++)
+          	printf("OPEN x: %d, y: %d\n", openList[i].x, openList[i].y);
+      else
+        printf("OPEN: empty\n");
     }
 
   }
@@ -159,6 +163,6 @@ int main(int argc, char *argv[]) {
   Node grid[ROW][COL];
   srand(time(0));
   initNodes(grid);
-  aStarSearch(grid, grid[0][0], grid[4][4]);
+  aStarSearch(grid, grid[0][0], grid[1][1]);
   return 0;
 }
