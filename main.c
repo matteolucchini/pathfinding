@@ -22,7 +22,6 @@ typedef struct node {
   int x;
   int y;
   float cost;
-  Pair nearNodes[N_DIRECTION];
 } Node;
 
 // funzione che calcola i nodi vicini, per ogni nodo
@@ -49,13 +48,11 @@ void initNodes(Node grid[ROW][COL]){
         grid[i][j].y = j;
       }
     }
-    /*
     for(int i = 0; i < ROW; i++) {
       for(int j = 0; j < COL; j++)
           printf("%.2f \t", grid[i][j].cost);
       printf("\n");
     }
-    */
 }
 
 /*
@@ -98,7 +95,7 @@ void rmNode(Node *list, Node node, int rm_index, int counter) {
   //   if(i < rm_index)
   //     tmp_list[i] = list[i];
   //   if(i > rm_index)
-  //     tmp_list[i - 1] = list[i - 1];
+  //     tmp_list[i - 1] = list[i];
   // }
 }
 
@@ -160,6 +157,12 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       return;
     } else {
       addNode(closedList, q, countClosed, dimClosed);
+      rmNode(openList, q, rm_index, countOpen);
+      // print lists
+      for(int i = 0; i < countClosed; i++) {
+        printf("OPEN x: %d, y: %d\n", openList[i].x, openList[i].y);
+        printf("CLOSED x: %d, y: %d\n", closedList[i].x, closedList[i].y);
+      }
     }
 
   }
@@ -174,5 +177,6 @@ int main(int argc, char *argv[]) {
   Node grid[ROW][COL];
   srand(time(0));
   initNodes(grid);
+  aStarSearch(grid, grid[0][0], grid[4][4]);
   return 0;
 }
