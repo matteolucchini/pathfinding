@@ -89,8 +89,9 @@ void addNode(Node *list, Node node, int *counter, int *dim) {
   //   list = realloc(list, counter * sizeof(Node));
 }
 
-void rmNode(Node *list, Node node, int rm_index, int counter) {
-  memmove(list, list + rm_index, (counter - rm_index) * sizeof(Node));
+void rmNode(Node *list, Node node, int *rm_index, int *counter) {
+  memmove(list, list + *rm_index, (*counter - *rm_index) * sizeof(Node));
+  *counter-=1
   // for(int i = 0; i < counter; i++) {
   //   if(i < rm_index)
   //     tmp_list[i] = list[i];
@@ -158,7 +159,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       return;
     } else {
       addNode(closedList, q, &countClosed, &dimClosed);
-      rmNode(openList, q, rm_index, countOpen);
+      rmNode(openList, q, &rm_index, &countOpen);
       // print lists
       for(int i = 0; i < countClosed; i++) {
         printf("OPEN x: %d, y: %d\n", openList[i].x, openList[i].y);
