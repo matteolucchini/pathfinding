@@ -76,15 +76,15 @@ int* getptr(int argc, char *argv[]){
 */
 
  // aggiunge i nodi in una lista
-void addNode(Node *list, Node node, int counter, int dim) {
-  counter++;
+void addNode(Node *list, Node node, int *counter, int *dim) {
+  *counter += 1;
+  printf("%d\n", *counter);
   if(dim < counter) {
-    dim = pow(counter, 2);
-    list = realloc(list, dim * sizeof(Node));
+    *dim = pow(*counter, 2);
+    list = realloc(list, *dim * sizeof(Node));
   }
 
-  list[counter - 1] = node;
-
+  list[*counter - 1] = node;
   // if(dim > counter)
   //   list = realloc(list, counter * sizeof(Node));
 }
@@ -133,7 +133,8 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
   int rm_index;
 
   // add starting node to open list
-  addNode(openList, src, countOpen, dimOpen);
+  addNode(openList, src, &countOpen, &dimOpen);
+  printf("%d", countOpen);
 
   while(countOpen != 0) {
     if(countOpen == 1) {
@@ -156,7 +157,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       printf("Costo: %f\n", f_min);
       return;
     } else {
-      addNode(closedList, q, countClosed, dimClosed);
+      addNode(closedList, q, &countClosed, &dimClosed);
       rmNode(openList, q, rm_index, countOpen);
       // print lists
       for(int i = 0; i < countClosed; i++) {
