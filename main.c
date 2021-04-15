@@ -25,12 +25,26 @@ typedef struct node {
 } Node;
 
 // funzione che calcola i nodi vicini, per ogni nodo
-void setNearNodes(Node grid[ROW][COL], Node src) {
-  for(int i = 0; i < ROW; i++) {
-    for(int j = 0; j < COL; j++) {
-
+Node *setNearNodes(Node grid[ROW][COL], Node q) {
+  static Node nearNodes[8];
+  int x = q.x - 1;
+  int y = q.y - 1;
+  int c = 0;
+  for(int i = x; i <= x + 2; i++) {
+    for(int j = y; j <= y + 2; j++) {
+      if((i >= 0 && i < COL) && (j >= 0 && j < ROW)) {
+      	if (!(i == q.x && j == q.y)) {
+        	nearNodes[c] = grid[i][j];
+      		c++;
+		  }
+      } else {
+        Node tmp = {i, j, -1};
+        nearNodes[c] = tmp;
+        c++;
+      }
     }
   }
+  return nearNodes;
 }
 
 void initNodes(Node grid[ROW][COL]){
@@ -58,7 +72,7 @@ void initNodes(Node grid[ROW][COL]){
  // aggiunge i nodi in una lista
 void addNode(Node *list, Node node, int *counter, int *dim) {
   *counter += 1;
-  printf("%d\n", *counter);
+  //printf("%d\n", *counter);
   if(dim < counter) {
     *dim = pow(*counter, 2);
     list = realloc(list, *dim * sizeof(Node));
@@ -93,9 +107,12 @@ float calculateGValue(Node *closedList, int countClosed) {
   return totCost;
 }
 
+// f = g + h
 float calculateFValue(Node current, Node dest, Node *closedList, int countClosed) {
   return (float)(calculateGValue(closedList, countClosed) + calculateHValue(current, dest));
 }
+
+
 
 // A* algorithm
 void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
@@ -105,6 +122,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
   int countClosed = 0;
   Node *openList = (Node*) malloc(dimOpen * sizeof(Node));
   Node *closedList = (Node*) malloc(dimClosed * sizeof(Node));
+  Node *nearNodes;
   Node q;
   float f = 0; // g + h
   float g = 0; // movement cost to move from the starting point to a given square on the grid, following the path generated to get there
@@ -115,21 +133,30 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
   // add starting node to open list
   addNode(openList, src, &countOpen, &dimOpen);
 
+  // se la openList non è vuota:
   while(countOpen != 0) {
-    if(countOpen == 1) {
-      f_min = calculateFValue(openList[0], dst, closedList, countClosed);
-      q = src;
-      rm_index = countOpen - 1;
-    } else {
-      for(int i = 1; i < countOpen; i++) {
-        f = calculateFValue(openList[i], dst, closedList, countClosed);
-        if(f < f_min) {
-          f_min = f;
-          q = openList[i];
-          rm_index = i;
-        }
+    f_min = calculateFValue(openList[0], dst, closedList, countClosed);
+    rm_index = 0;
+    for(int i = 1; i < countOpen; i++) {
+      f = calculateFValue(openList[i], dst, closedList, countClosed);
+      if(f < f_min) {
+        f_min = f;
+        rm_index = i;
       }
     }
+    q = openList[rm_index];
+    rmNode(openList, q, &rm_index, &countOpen);
+    // c)
+    nearNodes = setNearNodes(grid, q);
+    break;
+  }
+    printf("************\n");
+    printf("Starting node: (%d, %d) --> cost: %f\n", src.x, src.y, src.cost);
+  for(int i = 0; i < sizeof(nearNodes); i++) {
+    printf("(%d, %d) --> cost: %f\n", nearNodes[i].x, nearNodes[i].y, nearNodes[i].cost);
+  }
+    printf("************\n");
+/*
     printf("q --> x: %d, y: %d\n", q.x, q.y);
     if(q.x == dst.x && q.y == dst.y) {
       printf("Percorso migliore trovato.\n");
@@ -150,11 +177,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       else
         printf("OPEN: empty\n");
     }
-
-  }
-
-
-
+*/
   //free(openList);
   free(closedList);
 }
