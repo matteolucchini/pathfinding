@@ -24,12 +24,13 @@ typedef struct node {
   int y;
   float cost;
   float f;
-  //Pair parent;
+  Pair parent;
 } Node;
 
 // funzione che calcola i nodi vicini, per ogni nodo
 Node *setNearNodes(Node grid[ROW][COL], Node q) {
   static Node nearNodes[N_DIRECTION];
+  Pair parent = {q.x, q.y};
   int x = q.x - 1;
   int y = q.y - 1;
   int c = 0;
@@ -38,7 +39,7 @@ Node *setNearNodes(Node grid[ROW][COL], Node q) {
       if((i >= 0 && i < COL) && (j >= 0 && j < ROW)) {
       	if (!(i == q.x && j == q.y)) {
         	nearNodes[c] = grid[i][j];
-            //nearNodes[c].parent = {q.x, q.y};
+            nearNodes[c].parent = parent;
       		c++;
 		    }
       } else {
@@ -60,15 +61,15 @@ bool isInList(Node node, Node *list, int *counter) {
 }
 
  // aggiunge i nodi in una lista
-void addNode(Node *list, Node node, int *counter, int *dim) {
+void addNode(Node **list, Node node, int *counter, int *dim) {
   *counter += 1;
   //printf("%d\n", *counter);
   if(dim < counter) {
     *dim = pow(*counter, 2);
-    list = realloc(list, *dim * sizeof(Node));
+    *list = realloc(*list, *dim * sizeof(Node));
   }
 
-  list[*counter - 1] = node;
+  *list[*counter - 1] = node;
   // if(dim > counter)
   //   list = realloc(list, counter * sizeof(Node));
 }
@@ -88,7 +89,7 @@ bool computeNearNodes(Node *nearNodes, Node dst, Node q, Node *openList, Node *c
           }
           nearNodes[i].f = q.cost + nearNodes[i].cost + calculateHValue(nearNodes[i], dst);
           if(!isInList(nearNodes[i], closedList, counterClosed)) {
-            addNode(openList, nearNodes[i], counterOpen, dimOpen);
+            addNode(&openList, nearNodes[i], counterOpen, dimOpen);
           }
         }
     }
@@ -130,9 +131,8 @@ void rmNode(Node** list, Node node, int *rm_index, int *counter) {
             tmp+*rm_index,
             (*list)+(*rm_index+1),
             (*counter - *rm_index)*sizeof(Node));
-            
+ 	
     *counter -= 1;
-
     *list = tmp;
 }
 
@@ -170,7 +170,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
 
   // add starting node to open list
   src.f = 0;
-  addNode(openList, src, &countOpen, &dimOpen);
+  addNode(&openList, src, &countOpen, &dimOpen);
 
   // se la openList non è vuota:
   while(countOpen != 0) {
@@ -191,7 +191,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
     nearNodes = setNearNodes(grid, q);
     if(computeNearNodes(nearNodes, dst, q, openList, closedList, &countOpen, &countClosed, &dimOpen))
       return;
-    addNode(closedList, q, &countClosed, &dimClosed);
+    addNode(&closedList, q, &countClosed, &dimClosed);
   }
   printf("************\n");
   printf("Starting node: (%d, %d) --> cost: %f\n", src.x, src.y, src.cost);
