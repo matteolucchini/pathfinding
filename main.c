@@ -120,13 +120,20 @@ void initNodes(Node grid[ROW][COL]){
 
 
 // rimuove i nodi dalla lista
-void rmNode(Node *list, Node node, int *rm_index, int *counter) {
-	Node tmp;
-	tmp = list[*rm_index];
-	list[*rm_index] = list[*counter-1];
-	list[*counter-1] = tmp;
-	*counter-=1;
-	list = realloc(list, *counter * sizeof(Node));
+void rmNode(Node** list, Node node, int *rm_index, int *counter) {
+	Node* tmp = malloc((*counter - 1) * sizeof(Node));
+	memmove(
+            tmp,
+            *list,
+            (*rm_index+1)*sizeof(Node));
+    memmove(
+            tmp+*rm_index,
+            (*list)+(*rm_index+1),
+            (*counter - *rm_index)*sizeof(Node));
+            
+    *counter -= 1;
+
+    *list = tmp;
 }
 
 
@@ -178,8 +185,8 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       }
     }
     q = openList[rm_index];
-    printf("(%d,%d)\n", q.x, q.y);
-    rmNode(openList, q, &rm_index, &countOpen);
+    printf("(%d,%d) %f\n", q.x, q.y, q.cost);
+    rmNode(&openList, q, &rm_index, &countOpen);
     // c)
     nearNodes = setNearNodes(grid, q);
     if(computeNearNodes(nearNodes, dst, q, openList, closedList, &countOpen, &countClosed, &dimOpen))
