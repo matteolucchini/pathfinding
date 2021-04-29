@@ -115,6 +115,7 @@ void initNodes(Node grid[ROW][COL]){
           printf("%.2f \t", grid[i][j].cost);
       printf("\n");
     }
+    printf("\n");
 }
 
 
@@ -177,6 +178,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
       }
     }
     q = openList[rm_index];
+    printf("(%d,%d)\n", q.x, q.y);
     rmNode(openList, q, &rm_index, &countOpen);
     // c)
     nearNodes = setNearNodes(grid, q);
@@ -190,36 +192,28 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
     printf("(%d, %d) --> cost: %f\n", nearNodes[i].x, nearNodes[i].y, nearNodes[i].cost);
   }
   printf("************\n");
-/*
-    printf("q --> x: %d, y: %d\n", q.x, q.y);
-    if(q.x == dst.x && q.y == dst.y) {
-      printf("Percorso migliore trovato.\n");
-      printf("Costo: %f\n", f_min);
-      return;
-    } else {
-      addNode(closedList, q, &countClosed, &dimClosed);
-      rmNode(openList, q, &rm_index, &countOpen);
-      // print lists
-      if(countClosed != 0)
-        for(int i = 0; i < countClosed; i++)
-          printf("CLOSED x: %d, y: %d\n", closedList[i].x, closedList[i].y);
-      else
-        printf("CLOSED: empty\n");
-      if(countOpen != 0)
-      	for(int i = 0; i < countOpen; i++)
-          	printf("OPEN x: %d, y: %d\n", openList[i].x, openList[i].y);
-      else
-        printf("OPEN: empty\n");
-    }
-*/
+
   free(openList);
   free(closedList);
 }
 
 int main(int argc, char *argv[]) {
-  Node grid[ROW][COL];
-  srand(time(0));
-  initNodes(grid);
-  aStarSearch(grid, grid[0][0], grid[1][1]);
-  return 0;
+  if(argc == 5) {
+    Node grid[ROW][COL];
+    int i = 0;
+    Pair src = {atoi(argv[1]), atoi(argv[2])};
+    Pair dst = {atoi(argv[3]), atoi(argv[4])};
+    srand(time(0));
+    initNodes(grid);
+    while(grid[src.x][src.y].cost == BLOCK_NODE || grid[dst.x][dst.y].cost == BLOCK_NODE) {
+      i++;
+      initNodes(grid);
+    }
+    aStarSearch(grid, grid[src.x][src.y], grid[dst.x][dst.y]);
+    printf("GRIGLIA RIFATTA: %d VOLTE\n", i);
+    return 0;
+  } else {
+    printf("Wrong parameters\n");
+    return 1;
+  }
 }
