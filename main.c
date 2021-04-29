@@ -51,8 +51,8 @@ Node *setNearNodes(Node grid[ROW][COL], Node q) {
   return nearNodes;
 }
 
-bool isInList(Node node, Node *list) {
-    for(int i = 0; i < sizeof(list); i++) {
+bool isInList(Node node, Node *list, int *counter) {
+    for(int i = 0; i < *counter; i++) {
         if(list[i].x == node.x && list[i].y == node.y && node.f > list[i].f)
             return true;
     }
@@ -79,7 +79,7 @@ float calculateHValue(Node current, Node dest){
 }
 
 // d)
-bool computeNearNodes(Node *nearNodes, Node dst, Node q, Node *openList, Node *closedList, int *counter, int *dim){
+bool computeNearNodes(Node *nearNodes, Node dst, Node q, Node *openList, Node *closedList, int *counterOpen, int *counterClosed, int *dimOpen){
     for(int i = 0; i < N_DIRECTION; i++) {
         if(nearNodes[i].cost != BLOCK_NODE) {
           if(nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
@@ -87,8 +87,8 @@ bool computeNearNodes(Node *nearNodes, Node dst, Node q, Node *openList, Node *c
             return true;
           }
           nearNodes[i].f = q.cost + nearNodes[i].cost + calculateHValue(nearNodes[i], dst);
-          if(!isInList(nearNodes[i], closedList)) {
-            addNode(openList, nearNodes[i], counter, dim);
+          if(!isInList(nearNodes[i], closedList, counterClosed)) {
+            addNode(openList, nearNodes[i], counterOpen, dimOpen);
           }
         }
     }
@@ -182,7 +182,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
     rmNode(openList, q, &rm_index, &countOpen);
     // c)
     nearNodes = setNearNodes(grid, q);
-    if(computeNearNodes(nearNodes, dst, q, openList, closedList, &countOpen, &dimOpen))
+    if(computeNearNodes(nearNodes, dst, q, openList, closedList, &countOpen, &countClosed, &dimOpen))
       return;
     addNode(closedList, q, &countClosed, &dimClosed);
   }
