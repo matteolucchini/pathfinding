@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include <math.h>
 #include <string.h>
@@ -22,11 +23,13 @@ typedef struct node {
   int x;
   int y;
   float cost;
+  float f;
+  //Pair parent;
 } Node;
 
 // funzione che calcola i nodi vicini, per ogni nodo
 Node *setNearNodes(Node grid[ROW][COL], Node q) {
-  static Node nearNodes[8];
+  static Node nearNodes[N_DIRECTION];
   int x = q.x - 1;
   int y = q.y - 1;
   int c = 0;
@@ -35,16 +38,61 @@ Node *setNearNodes(Node grid[ROW][COL], Node q) {
       if((i >= 0 && i < COL) && (j >= 0 && j < ROW)) {
       	if (!(i == q.x && j == q.y)) {
         	nearNodes[c] = grid[i][j];
+            //nearNodes[c].parent = {q.x, q.y};
       		c++;
-		  }
+		    }
       } else {
-        Node tmp = {i, j, -1};
+        Node tmp = {i, j, BLOCK_NODE};
         nearNodes[c] = tmp;
         c++;
       }
     }
   }
   return nearNodes;
+}
+
+bool isInList(Node node, Node *list) {
+    for(int i = 0; i < sizeof(list); i++) {
+        if(list[i].x == node.x && list[i].y == node.y && node.f > list[i].f)
+            return true;
+    }
+    return false;
+}
+
+ // aggiunge i nodi in una lista
+void addNode(Node *list, Node node, int *counter, int *dim) {
+  *counter += 1;
+  //printf("%d\n", *counter);
+  if(dim < counter) {
+    *dim = pow(*counter, 2);
+    list = realloc(list, *dim * sizeof(Node));
+  }
+
+  list[*counter - 1] = node;
+  // if(dim > counter)
+  //   list = realloc(list, counter * sizeof(Node));
+}
+
+  // Return using the distance formula
+float calculateHValue(Node current, Node dest){
+  return (float)sqrt(pow(current.x - dest.x, 2) + pow(current.y - dest.y, 2));
+}
+
+// d)
+bool computeNearNodes(Node *nearNodes, Node dst, Node q, Node *openList, Node *closedList, int *counter, int *dim){
+    for(int i = 0; i < N_DIRECTION; i++) {
+        if(nearNodes[i].cost != BLOCK_NODE) {
+          if(nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
+            printf("ARRIVATO YUHUUU!\n");
+            return true;
+          }
+          nearNodes[i].f = q.cost + nearNodes[i].cost + calculateHValue(nearNodes[i], dst);
+          if(!isInList(nearNodes[i], closedList)) {
+            addNode(openList, nearNodes[i], counter, dim);
+          }
+        }
+    }
+    return false;
 }
 
 void initNodes(Node grid[ROW][COL]){
@@ -69,19 +117,6 @@ void initNodes(Node grid[ROW][COL]){
     }
 }
 
- // aggiunge i nodi in una lista
-void addNode(Node *list, Node node, int *counter, int *dim) {
-  *counter += 1;
-  //printf("%d\n", *counter);
-  if(dim < counter) {
-    *dim = pow(*counter, 2);
-    list = realloc(list, *dim * sizeof(Node));
-  }
-
-  list[*counter - 1] = node;
-  // if(dim > counter)
-  //   list = realloc(list, counter * sizeof(Node));
-}
 
 // rimuove i nodi dalla lista
 void rmNode(Node *list, Node node, int *rm_index, int *counter) {
@@ -91,26 +126,21 @@ void rmNode(Node *list, Node node, int *rm_index, int *counter) {
 	list[*counter-1] = tmp;
 	*counter-=1;
 	list = realloc(list, *counter * sizeof(Node));
-
 }
 
-  // Return using the distance formula
-float calculateHValue(Node current, Node dest){
-  return (float)sqrt(pow(current.x - dest.x, 2) + pow(current.y - dest.y, 2));
-}
 
-float calculateGValue(Node *closedList, int countClosed) {
-  float totCost = 0;
-  for(int i = 0; i < countClosed; i++)
-    totCost += closedList[i].cost;
+// float calculateGValue(Node *closedList, int countClosed) {
+//   float totCost = 0;
+//   for(int i = 0; i < countClosed; i++)
+//     totCost += closedList[i].cost;
 
-  return totCost;
-}
+//   return totCost;
+// }
 
 // f = g + h
-float calculateFValue(Node current, Node dest, Node *closedList, int countClosed) {
-  return (float)(calculateGValue(closedList, countClosed) + calculateHValue(current, dest));
-}
+// float calculateFValue(Node current, Node dest, Node *closedList, int countClosed) {
+//   return current.f = (float)(calculateGValue(closedList, countClosed) + calculateHValue(current, dest));
+// }
 
 
 
@@ -125,20 +155,22 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
   Node *nearNodes;
   Node q;
   float f = 0; // g + h
-  float g = 0; // movement cost to move from the starting point to a given square on the grid, following the path generated to get there
-  float h = 0; // heuristic function
+  //float g = 0; // movement cost to move from the starting point to a given square on the grid, following the path generated to get there
+  //float h = 0; // heuristic function
   float f_min;
   int rm_index;
 
   // add starting node to open list
+  src.f = 0;
   addNode(openList, src, &countOpen, &dimOpen);
 
   // se la openList non è vuota:
   while(countOpen != 0) {
-    f_min = calculateFValue(openList[0], dst, closedList, countClosed);
+    // a,b)
+    f_min = src.f;
     rm_index = 0;
     for(int i = 1; i < countOpen; i++) {
-      f = calculateFValue(openList[i], dst, closedList, countClosed);
+      f = openList[i].f;
       if(f < f_min) {
         f_min = f;
         rm_index = i;
@@ -148,14 +180,16 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
     rmNode(openList, q, &rm_index, &countOpen);
     // c)
     nearNodes = setNearNodes(grid, q);
-    break;
+    if(computeNearNodes(nearNodes, dst, q, openList, closedList, &countOpen, &dimOpen))
+      return;
+    addNode(closedList, q, &countClosed, &dimClosed);
   }
-    printf("************\n");
-    printf("Starting node: (%d, %d) --> cost: %f\n", src.x, src.y, src.cost);
+  printf("************\n");
+  printf("Starting node: (%d, %d) --> cost: %f\n", src.x, src.y, src.cost);
   for(int i = 0; i < sizeof(nearNodes); i++) {
     printf("(%d, %d) --> cost: %f\n", nearNodes[i].x, nearNodes[i].y, nearNodes[i].cost);
   }
-    printf("************\n");
+  printf("************\n");
 /*
     printf("q --> x: %d, y: %d\n", q.x, q.y);
     if(q.x == dst.x && q.y == dst.y) {
@@ -178,7 +212,7 @@ void aStarSearch(Node grid[ROW][COL], Node src, Node dst) {
         printf("OPEN: empty\n");
     }
 */
-  //free(openList);
+  free(openList);
   free(closedList);
 }
 
