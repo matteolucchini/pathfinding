@@ -64,8 +64,8 @@ bool isInList(Pair node, Pair * list, int * counter) {
 // aggiunge i nodi in una lista
 void addNode(Pair * list, Pair node, int * counter, int * dim) {
     * counter += 1;
-    //printf("%d\n", *counter);
-    if (dim < counter) {
+    printf("\ncounter: %d, dim: %d\n", *counter, *dim);
+    if (*dim < *counter) {
         * dim = pow( * counter, 2);
         list = realloc(list, * dim * sizeof(Pair));
     }
@@ -95,12 +95,13 @@ bool computeNearNodes(Node details[ROW][COL], Pair * nearNodes, int c, Pair dst,
             gNew = details[q.x][q.y].g + 1.0;
             hNew = calculateHValue(nearNodes[i], dst);
             fNew = gNew + hNew;
-            if (details[nearNodes[i].x][nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x][nearNodes[i].y].f > fNew)
+            if (details[nearNodes[i].x][nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x][nearNodes[i].y].f > fNew) {
                 addNode(openList, nearNodes[i], counterOpen, dimOpen);
-            details[nearNodes[i].x][nearNodes[i].y].f = fNew;
-            details[nearNodes[i].x][nearNodes[i].y].g = gNew;
-            details[nearNodes[i].x][nearNodes[i].y].h = hNew;
-            details[nearNodes[i].x][nearNodes[i].y].parent = q;
+                details[nearNodes[i].x][nearNodes[i].y].f = fNew;
+                details[nearNodes[i].x][nearNodes[i].y].g = gNew;
+                details[nearNodes[i].x][nearNodes[i].y].h = hNew;
+                details[nearNodes[i].x][nearNodes[i].y].parent = q;
+            }
         }
     }
     return false;
@@ -192,7 +193,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         printf("%d", countOpen);
     }
 
-    printf("Nope");
+    printf("\nNope\n");
     free(openList);
     free(closedList);
     free(nearNodes);
