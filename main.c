@@ -12,7 +12,7 @@
 #define MIN_COST 1
 #define BLOCK_NODE 0
 #define N_DIRECTION 8
-#define DEBUG true
+#define DEBUG false
 
 // Dichiaro coppie per rappresentare il punto con le sue coordinate
 typedef struct pair {
@@ -78,7 +78,8 @@ void addNode(Pair ** list, Pair node, int * counter, int * dim) {
     int c = *counter+1;
     
     if (d <= c) {
-        d = pow(c, 2);
+    	Pair * tmp;
+        d *= 2;
         *dim = d;
         *list = realloc(*list, d * sizeof(Pair));
         if(list == NULL) exit(15);
@@ -91,9 +92,9 @@ void addNode(Pair ** list, Pair node, int * counter, int * dim) {
 	    printf("\tlast valid instance: %d \n",c-1);
 	}
 	
-    *list[c-1] = node;
+    (*list)[c-1] = node;
     if (DEBUG){
-	    printf("\tlist: (%d %d) \n",list[c - 1]->x, list[c - 1]->y);
+	    printf("\tlist: (%d %d) \n",(*list)[c - 1].x, (*list)[c - 1].y);
 	    printf("\tnode: (%d %d) \n",node.x, node.y);
 		printf("*************\n");
 	}
@@ -299,6 +300,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 		}
 		
 		free(nearNodes);
+		nearNodes = NULL;
     }
 
     printf("\nNope");
