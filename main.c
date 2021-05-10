@@ -106,41 +106,6 @@ float calculateHValue(Pair current, Pair dest) {
     return (float) sqrt(pow(current.x - dest.x, 2) + pow(current.y - dest.y, 2));
 }
 
-// d)
-//bool computeNearNodes(Node details[ROW][COL], Pair * nearNodes, int c, Pair dst, Pair q, Pair * openList, Pair * closedList, int * counterOpen, int * counterClosed, int * dimOpen) {
-//    float gNew;
-//    float hNew;
-//    float fNew;
-//
-//    for (int i = 0; i < c; i++) {
-//        if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
-//            printf("ARRIVATO YUHUUU!\n");
-//            return true;
-//        }
-//        if (!isInList(nearNodes[i], closedList, counterClosed)) {
-//            gNew = details[q.x][q.y].g + 1.0;
-//            hNew = calculateHValue(nearNodes[i], dst);
-//            fNew = gNew + hNew;
-//            if (details[nearNodes[i].x][nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x][nearNodes[i].y].f > fNew){
-//				openList = addNode(&openList, nearNodes[i], counterOpen, dimOpen);  
-//				             
-//				if (DEBUG){
-//				    printf("\n*************\n");
-//				    printf("c = %d\n",*counterOpen);
-//				    printf("actual nearnode (%d %d) \n",nearNodes[i].x, nearNodes[i].y);
-//				    printf("open list c-1 (%d %d) \n",openList[*counterOpen-1].x, openList[*counterOpen-1].y);
-// 					printf("*************");
-//				}
-//	            details[nearNodes[i].x][nearNodes[i].y].f = fNew;
-//	            details[nearNodes[i].x][nearNodes[i].y].g = gNew;
-//	            details[nearNodes[i].x][nearNodes[i].y].h = hNew;
-//	            details[nearNodes[i].x][nearNodes[i].y].parent = q;
-//	        }
-//        }
-//    }
-//    return false;
-//}
-
 void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
@@ -185,6 +150,34 @@ void rmNode(Pair * list, int * rm_index, int * counter) {
     *counter = c;
 }
 
+void swap(Pair * array, int l, int r){
+    Pair tmp = (array)[l];
+    (array)[l] = (array)[r];
+    (array)[r] = tmp;
+}
+
+//source wikipedia
+void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
+    float pivot;
+    int l, r; 
+    if (end > begin) {
+       pivot = details[array[begin].x][array[begin].y].f;
+       l = begin + 1;
+       r = end + 1;
+       while(l < r)
+            if (details[array[l].x][array[l].y].f < pivot) 
+                l++;
+            else {
+                r--;
+                swap(array, l, r); 
+            }
+            l--;
+            swap(array, begin, l);
+            quickSort(array, details, begin, l);
+            quickSort(array, details, r, end);
+    }
+}
+
 // A* algorithm
 void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst) {
     int dimOpen = 1;
@@ -218,6 +211,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     // se la openList non è vuota:
     while (countOpen != 0) {
         // a,b)
+        quickSort(openList, details, 0, countOpen);
         f_min = details[openList[0].x][openList[0].y].f;
         rm_index = 0;
         for (int i = 1; i < countOpen; i++) {
@@ -301,6 +295,8 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 		
 		free(nearNodes);
 		nearNodes = NULL;
+
+
     }
 
     printf("\nNope");
