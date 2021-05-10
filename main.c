@@ -6,8 +6,8 @@
 #include <string.h>
 #include <float.h>
 
-#define ROW 5 // rows of the grid
-#define COL 5 // cols of the grid
+#define ROW 7 // rows of the grid
+#define COL 7 // cols of the grid
 #define MAX_COST 10
 #define MIN_COST 1
 #define BLOCK_NODE 0
@@ -151,12 +151,12 @@ void rmNode(Pair * list, int * rm_index, int * counter) {
 }
 
 void swap(Pair * array, int l, int r){
-    Pair tmp = (array)[l];
-    (array)[l] = (array)[r];
-    (array)[r] = tmp;
+    Pair tmp = array[l];
+    array[l] = (array)[r];
+    array[r] = tmp;
 }
 
-//source wikipedia
+//source wikiversity
 void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     float pivot;
     int l, r; 
@@ -211,7 +211,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     // se la openList non è vuota:
     while (countOpen != 0) {
         // a,b)
-        quickSort(openList, details, 0, countOpen);
+        quickSort(openList, details, 0, countOpen-1);
         f_min = details[openList[0].x][openList[0].y].f;
         rm_index = 0;
         for (int i = 1; i < countOpen; i++) {
