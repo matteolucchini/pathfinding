@@ -5,14 +5,12 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
-
-#define ROW 7 // rows of the grid
-#define COL 7 // cols of the grid
+#define ROW 5
+#define COL 5
 #define MAX_COST 10
 #define MIN_COST 1
 #define BLOCK_NODE 0
 #define N_DIRECTION 8
-#define DEBUG false
 
 // Dichiaro coppie per rappresentare il punto con le sue coordinate
 typedef struct pair {
@@ -36,7 +34,7 @@ Node;
 Pair* setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c) {
     Pair* nearNodes = malloc(N_DIRECTION * sizeof(Pair));
     int count = 0;
-	int x = q.x - 1;
+    int x = q.x - 1;
     int y = q.y - 1;
     for (int i = x; i <= x + 2; i++) {
         for (int j = y; j <= y + 2; j++) {
@@ -48,13 +46,6 @@ Pair* setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c) 
                     };
                     nearNodes[count]= tmp;
                     details[i][j].parent = q;
-                    if (DEBUG){
-					    printf("\n*************\n");
-					    printf("tmp (%d %d) \n",tmp.x, tmp.y);
-					    printf("actual nearnode (%d %d) \n",nearNodes[count].x, nearNodes[count].y);
-					    printf("parent (%d %d) \n",details[i][j].parent.x, details[i][j].parent.y);
-						printf("*************\n");
-					}
                     count += 1;
                 }
             }
@@ -76,28 +67,16 @@ bool isInList(Pair node, Pair * list, int * counter) {
 void addNode(Pair ** list, Pair node, int * counter, int * dim) {
     int d = *dim;
     int c = *counter+1;
-    
+
     if (d <= c) {
-    	Pair * tmp;
+        Pair * tmp;
         d *= 2;
         *dim = d;
         *list = realloc(*list, d * sizeof(Pair));
         if(list == NULL) exit(15);
     }
 
-	if (DEBUG){
-	    printf("\n*************\n");
-	    printf("\tdim: %d \n",d);
-	    printf("\tnew counter: %d \n",c);
-	    printf("\tlast valid instance: %d \n",c-1);
-	}
-	
     (*list)[c-1] = node;
-    if (DEBUG){
-	    printf("\tlist: (%d %d) \n",(*list)[c - 1].x, (*list)[c - 1].y);
-	    printf("\tnode: (%d %d) \n",node.x, node.y);
-		printf("*************\n");
-	}
     *counter = c;
 }
 
@@ -114,13 +93,17 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                     details[i][j].g = 0;
                     details[i][j].h = 0;
                     details[i][j].f = 0;
-                    details[i][j].parent = (Pair) {i, j};
-                    
+                    details[i][j].parent = (Pair) {
+                        i, j
+                    };
+
                 } else {
                     details[i][j].g = FLT_MAX;
                     details[i][j].h = FLT_MAX;
                     details[i][j].f = FLT_MAX;
-               	 	details[i][j].parent = (Pair) {-1, -1};
+                    details[i][j].parent = (Pair) {
+                        -1, -1
+                    };
                 }
                 grid[i][j] = 1;
             } else {
@@ -139,18 +122,18 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
 }
 
 // rimuove i nodi dalla lista
-void rmNode(Pair * list, int * rm_index, int * counter) {
-	Pair tmp;
-	int c = *counter;
-    for (int i = * rm_index; i < c - 1; i++){
-    	tmp = list[i + 1];
+void rmNode(Pair * list, int rm_index, int * counter) {
+    Pair tmp;
+    int c = *counter;
+    for (int i = rm_index; i < c - 1; i++) {
+        tmp = list[i + 1];
         list[i] = tmp;
     }
-    c -= 1;
+    c--;
     *counter = c;
 }
 
-void swap(Pair * array, int l, int r){
+void swap(Pair * array, int l, int r) {
     Pair tmp = array[l];
     array[l] = (array)[r];
     array[r] = tmp;
@@ -159,22 +142,22 @@ void swap(Pair * array, int l, int r){
 //source wikiversity
 void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     float pivot;
-    int l, r; 
+    int l, r;
     if (end > begin) {
-       pivot = details[array[begin].x][array[begin].y].f;
-       l = begin + 1;
-       r = end + 1;
-       while(l < r)
-            if (details[array[l].x][array[l].y].f < pivot) 
+        pivot = details[array[begin].x][array[begin].y].f;
+        l = begin + 1;
+        r = end + 1;
+        while(l < r)
+            if (details[array[l].x][array[l].y].f < pivot)
                 l++;
             else {
                 r--;
-                swap(array, l, r); 
+                swap(array, l, r);
             }
-            l--;
-            swap(array, begin, l);
-            quickSort(array, details, begin, l);
-            quickSort(array, details, r, end);
+        l--;
+        swap(array, begin, l);
+        quickSort(array, details, begin, l);
+        quickSort(array, details, r, end);
     }
 }
 
@@ -185,131 +168,66 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     int countOpen = 0;
     int countClosed = 0;
     int c = 0;
-    Pair * openList = malloc(dimOpen * sizeof(Pair));
-    Pair * closedList = malloc(dimClosed * sizeof(Pair));
-    Pair * nearNodes;
-    Pair q;
+    int rm_index;
     float f_min;
     float f;
     float gNew;
     float hNew;
     float fNew;
-    int rm_index;
+    Pair * openList = malloc(dimOpen * sizeof(Pair));
+    Pair * closedList = malloc(dimClosed * sizeof(Pair));
+    Pair * nearNodes = NULL;
+    Pair q;
 
     // add starting node to open list
-    if(DEBUG)
-    	printf("\n*************\nAdd node OpenList\n*************");
     addNode(&openList, src, & countOpen, & dimOpen);
-    
-    if (DEBUG){
-        printf("\n*************\nOpenList: \n");
-        for(int i = 0; i < countOpen; i++)
-        	printf("\t(%d %d) \n",openList[i].x, openList[i].y);
-		printf("*************\n");
-	}
 
     // se la openList non è vuota:
     while (countOpen != 0) {
         // a,b)
         quickSort(openList, details, 0, countOpen-1);
-        f_min = details[openList[0].x][openList[0].y].f;
-        rm_index = 0;
-        for (int i = 1; i < countOpen; i++) {
-            f = details[openList[i].x][openList[i].y].f;
-            if (f < f_min) {
-                f_min = f;
-                rm_index = i;
-            }
-        }
-        q = openList[rm_index];
-        rmNode(openList, & rm_index, & countOpen);
-        
-        if (DEBUG){
-        	printf("\n*************\nOpenList: \n");
-        	for(int i = 0; i < countOpen; i++)
-        		printf("\t(%d %d) \n",openList[i].x, openList[i].y);
-			printf("*************\n");
-		}	
-        
-        if(DEBUG)
-    		printf("\n*************\nAdd node ClosedList\n*************");
+        q = openList[0];
+        rmNode(openList, 0, & countOpen);
         addNode(&closedList, q, &countClosed, &dimClosed);
-        
-        if (DEBUG){
-        	printf("\n*************\nClosedList: \n");
-        	for(int i = 0; i < countClosed; i++)
-        		printf("\t(%d %d) \n",closedList[i].x, closedList[i].y);
-			printf("*************\n");
-		}
         printf("(%d,%d)\n", q.x, q.y);
         // c)
         nearNodes = setNearNodes(grid, details, q, & c);
-        
-        if (DEBUG){
-        	printf("\n*************\nNearNodes: \n");
-        	for(int i = 0; i < c; i++)
-        	printf("\t(%d %d) \n",nearNodes[i].x, nearNodes[i].y);
-			printf("*************\n");
-		}
-		
-		for (int i = 0; i < c; i++) {
-		    if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
-		        printf("ARRIVATO YUHUUU!\n");
-			    free(openList);
-			    free(closedList);
-				free(nearNodes);
-		        return;
-		    }
-	        if (!isInList(nearNodes[i], closedList, &countClosed)) {
-	            gNew = details[q.x][q.y].g + 1.0;
-	            hNew = calculateHValue(nearNodes[i], dst);
-	            fNew = gNew + hNew;
-	            if (details[nearNodes[i].x][nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x][nearNodes[i].y].f > fNew){
-	            	if(DEBUG)
-    					printf("\n*************\nAdd node OpenList\n*************");
-					addNode(&openList, nearNodes[i], &countOpen, &dimOpen);  
-					             
-					if (DEBUG){
-					    printf("\n*************\n");
-					    printf("c = %d\n",countOpen);
-					    printf("actual nearnode (%d %d) \n",nearNodes[i].x, nearNodes[i].y);
-					    printf("open list c-1 (%d %d) \n",openList[countOpen-1].x, openList[countOpen-1].y);
-	 					printf("*************\n");
-					}
-					
-		            details[nearNodes[i].x][nearNodes[i].y].f = fNew;
-		            details[nearNodes[i].x][nearNodes[i].y].g = gNew;
-		            details[nearNodes[i].x][nearNodes[i].y].h = hNew;
-		            details[nearNodes[i].x][nearNodes[i].y].parent = q;
-		        	}
-	        	}
-    	}
-        
-        if (DEBUG){
-	        printf("\n*************\nOpenList: \n");
-	        for(int i = 0; i < countOpen; i++)
-	        	printf("\t(%d %d) \n",openList[i].x, openList[i].y);   
-        	printf("countopen: %d\n", countOpen);
-			printf("*************\n");
-		}
-		
-		free(nearNodes);
-		nearNodes = NULL;
 
+        for (int i = 0; i < c; i++) {
+            if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
+                printf("(%d,%d)\n", dst.x, dst.y);
+                printf("ARRIVED! YUHUUU!\n");
+                free(openList);
+                free(closedList);
+                free(nearNodes);
+                return;
+            }
+            if (!isInList(nearNodes[i], closedList, &countClosed)) {
+                gNew = details[q.x][q.y].g + 1.0;
+                hNew = calculateHValue(nearNodes[i], dst);
+                fNew = gNew + hNew;
+                if (details[nearNodes[i].x][nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x][nearNodes[i].y].f > fNew) {
+                    addNode(&openList, nearNodes[i], &countOpen, &dimOpen);
 
+                    details[nearNodes[i].x][nearNodes[i].y].f = fNew;
+                    details[nearNodes[i].x][nearNodes[i].y].g = gNew;
+                    details[nearNodes[i].x][nearNodes[i].y].h = hNew;
+                    details[nearNodes[i].x][nearNodes[i].y].parent = q;
+                }
+            }
+        }
+        free(nearNodes);
+        nearNodes = NULL;
     }
 
     printf("\nNope");
     free(openList);
     free(closedList);
-	free(nearNodes);
+    free(nearNodes);
 }
 
 int main(int argc, char * argv[]) {
-    if (argc == 5) {
-        int grid[ROW][COL];
-        Node details[ROW][COL];
-        int i = 0;
+    if (argc <= 5) {
         Pair src = {
             atoi(argv[1]),
             atoi(argv[2])
@@ -318,8 +236,14 @@ int main(int argc, char * argv[]) {
             atoi(argv[3]),
             atoi(argv[4])
         };
+        if (src.x == dst.x && src.y == dst.y){
+        	printf("The starting node is the same of the destination one.\n");
+        	return 2;
+		}
+        int grid[ROW][COL];
+        int i = 0;
+        Node details[ROW][COL];
         srand(time(0));
-        initNodes(grid, details, src);
         while (grid[src.x][src.y] == BLOCK_NODE || grid[dst.x][dst.y] == BLOCK_NODE) {
             i++;
             initNodes(grid, details, src);
@@ -328,7 +252,7 @@ int main(int argc, char * argv[]) {
         printf("\nGrid redone %d time(s)\n", i);
         return 0;
     } else {
-        printf("Wrong parameters\n");
+        printf("Wrong parameters.\n");
         return 1;
     }
 }
