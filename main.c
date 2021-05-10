@@ -115,7 +115,7 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
 
         }
         for (int j = 0; j < COL; j++)
-            printf("%d \t", grid[i][j]);
+            printf("%d ", grid[i][j]);
         printf("\n");
     }
     printf("\n");
@@ -227,7 +227,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 }
 
 int main(int argc, char * argv[]) {
-    if (argc <= 5) {
+    if (argc >= 5) {
         Pair src = {
             atoi(argv[1]),
             atoi(argv[2])
