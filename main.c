@@ -220,7 +220,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         nearNodes = NULL;
     }
 
-    printf("\nNope");
+    printf("\nImpossible to reach the destination!");
     free(openList);
     free(closedList);
     free(nearNodes);
