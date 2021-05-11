@@ -93,8 +93,7 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                     details[i][j].h = 0;
                     details[i][j].f = 0;
                     details[i][j].parent = (Pair) {
-                        i,
-                        j
+                        i, j
                     };
 
                 } else {
@@ -112,15 +111,9 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
 
             details[i][j].x = i;
             details[i][j].y = j;
-
+            
         }
-        
-        /*for (int j = 0; j < COL; j++)
-            printf("%d ", grid[i][j]);
-        printf("\n");
-        */
     }
-    //printf("\n");
 }
 
 // This "removes" a node in the list, by shifting back all the values after rm_index-th element
@@ -141,7 +134,7 @@ void swap(Pair * array, int l, int r) {
     array[r] = tmp;
 }
 
-// (Source wikiversity) This order the array in decrescent order wrt the cost f
+// (Source wikiversity) This orders the array in decrescent order wrt the cost f
 void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     float pivot;
     int l, r;
@@ -175,7 +168,7 @@ void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath
                     i,
                     j
                 };
-                if (isInList(tmp, path, cPath)) putchar('x');
+                if (path!=NULL && isInList(tmp, path, cPath)) putchar('x');
                 else putchar('.');
             }
         }
@@ -263,8 +256,8 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         free(nearNodes);
         nearNodes = NULL;
     }
-
-    printf("\nImpossible to reach the destination!");
+    printf("Impossible to reach the destination!\n");
+	printMap(grid, details, NULL, 0);
     free(openList);
     free(closedList);
     free(nearNodes);
