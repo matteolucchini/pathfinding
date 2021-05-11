@@ -115,12 +115,12 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
 
         }
         
-        for (int j = 0; j < COL; j++)
+        /*for (int j = 0; j < COL; j++)
             printf("%d ", grid[i][j]);
         printf("\n");
-        
+        */
     }
-    printf("\n");
+    //printf("\n");
 }
 
 // This "removes" a node in the list, by shifting back all the values after rm_index-th element
