@@ -240,6 +240,10 @@ int main(int argc, char * argv[]) {
         	printf("The starting node is the same of the destination one.\n");
         	return 2;
 		}
+		if ((src.x < 0 || src.x >= COL) || (src.y < 0 || src.y >= ROW) || (dst.x < 0 || dst.x >= COL) || (dst.y < 0 || dst.y >= ROW)) {
+			printf("Wrong starting or destination node.\n");
+			return 3;
+		}
         int grid[ROW][COL];
         int i = 0;
         Node details[ROW][COL];
