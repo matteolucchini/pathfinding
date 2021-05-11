@@ -114,13 +114,13 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
             details[i][j].y = j;
 
         }
-        /*
+        
         for (int j = 0; j < COL; j++)
             printf("%d ", grid[i][j]);
         printf("\n");
-        */
+        
     }
-    //printf("\n");
+    printf("\n");
 }
 
 // This "removes" a node in the list, by shifting back all the values after rm_index-th element
@@ -292,6 +292,7 @@ int main(int argc, char * argv[]) {
         int i = 0;
         Node details[ROW][COL];
         srand(time(0));
+        initNodes(grid, details, src);
         while (grid[src.x][src.y] == BLOCK_NODE || grid[dst.x][dst.y] == BLOCK_NODE) {
             initNodes(grid, details, src);
         }
