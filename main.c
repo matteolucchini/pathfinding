@@ -5,21 +5,20 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
-#define ROW 5
-#define COL 5
-#define MAX_COST 10
-#define MIN_COST 1
+#define ROW 10
+#define COL 10
 #define BLOCK_NODE 0
-#define N_DIRECTION 8
+#define N_DIRECTION 8 	// This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
+						// If you really want to edit it anyway, good luck and many sons.
 
-// Dichiaro coppie per rappresentare il punto con le sue coordinate
+// Definition of the structure of a pair
 typedef struct pair {
     int x;
     int y;
 }
 Pair;
 
-// Dichiarazione struttura nodo
+// Definition of the structure of a node
 typedef struct node {
     int x;
     int y;
@@ -30,9 +29,9 @@ typedef struct node {
 }
 Node;
 
-// funzione che calcola i nodi vicini, per ogni nodo
-Pair* setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c) {
-    Pair* nearNodes = malloc(N_DIRECTION * sizeof(Pair));
+// This returns all the neighboring nodes of a given node q
+Pair * setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c) {
+    Pair * nearNodes = malloc(N_DIRECTION * sizeof(Pair));
     int count = 0;
     int x = q.x - 1;
     int y = q.y - 1;
@@ -44,16 +43,17 @@ Pair* setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c) 
                         i,
                         j
                     };
-                    nearNodes[count]= tmp;
+                    nearNodes[count] = tmp;
                     count += 1;
                 }
             }
         }
     }
-    *c = count;
+    * c = count;
     return nearNodes;
 }
 
+// This checks if a node is inside a list
 bool isInList(Pair node, Pair * list, int counter) {
     for (int i = 0; i < counter; i++) {
         if (list[i].x == node.x && list[i].y == node.y)
@@ -62,27 +62,28 @@ bool isInList(Pair node, Pair * list, int counter) {
     return false;
 }
 
-// aggiunge i nodi in una lista
+// This adds a node in a (dynamic) array (ex. openList)
 void addNode(Pair ** list, Pair node, int * counter, int * dim) {
-    int d = *dim;
-    int c = *counter+1;
+    int d = * dim;
+    int c = * counter + 1;
 
     if (d <= c) {
         d *= 2;
-        *dim = d;
-        *list = realloc(*list, d * sizeof(Pair));
-        if(list == NULL) exit(15);
+        * dim = d;
+        * list = realloc( * list, d * sizeof(Pair));
+        if (list == NULL) exit(15);
     }
 
-    (*list)[c-1] = node;
-    *counter = c;
+    ( * list)[c - 1] = node;
+    * counter = c;
 }
 
-// Return using the distance formula
+// This returns the h cost of a node by using the Euclidean formula
 float calculateHValue(Pair current, Pair dest) {
     return (float) sqrt(pow(current.x - dest.x, 2) + pow(current.y - dest.y, 2));
 }
 
+// This initializes each node of the grid
 void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
@@ -92,7 +93,8 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                     details[i][j].h = 0;
                     details[i][j].f = 0;
                     details[i][j].parent = (Pair) {
-                        i, j
+                        i,
+                        j
                     };
 
                 } else {
@@ -121,16 +123,16 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
     //printf("\n");
 }
 
-// rimuove i nodi dalla lista
+// This "removes" a node in the list, by shifting back all the values after rm_index-th element
 void rmNode(Pair * list, int rm_index, int * counter) {
     Pair tmp;
-    int c = *counter;
+    int c = * counter;
     for (int i = rm_index; i < c - 1; i++) {
         tmp = list[i + 1];
         list[i] = tmp;
     }
     c--;
-    *counter = c;
+    * counter = c;
 }
 
 void swap(Pair * array, int l, int r) {
@@ -139,7 +141,7 @@ void swap(Pair * array, int l, int r) {
     array[r] = tmp;
 }
 
-//source wikiversity
+// (Source wikiversity) This order the array in decrescent order wrt the cost f
 void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     float pivot;
     int l, r;
@@ -147,7 +149,7 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
         pivot = details[array[begin].x][array[begin].y].f;
         l = begin + 1;
         r = end + 1;
-        while(l < r)
+        while (l < r)
             if (details[array[l].x][array[l].y].f < pivot)
                 l++;
             else {
@@ -161,43 +163,48 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     }
 }
 
+// This prints just the map
 void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath) {
-	Pair tmp;
-	for (int i = 0; i < ROW; i++){
-		for (int j = 0; j < COL; j++){
-			if (grid[i][j] == 0)
-				putchar(0xdb);
-			else {
-				tmp = (Pair) {i,j};
-				if(isInList(tmp, path, cPath)) putchar('x');
-				else putchar('.');
-			}
-		}
-		putchar('\n');
-	}
+    Pair tmp;
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            if (grid[i][j] == 0)
+                putchar(0xdb);
+            else {
+                tmp = (Pair) {
+                    i,
+                    j
+                };
+                if (isInList(tmp, path, cPath)) putchar('x');
+                else putchar('.');
+            }
+        }
+        putchar('\n');
+    }
 }
 
+// This prints and returns the path that has been eventually found (NOT THE MAP)
 Pair * printPath(int grid[ROW][COL], Node details[ROW][COL], Pair dst, int * cPath) {
-	int dim = 1;
+    int dim = 1;
     int count = * cPath;
-	Pair current = dst;
-	Pair * path = malloc(dim * sizeof(Pair));
-	addNode(&path, current, &count, &dim);
-	while(!(current.x == details[current.x][current.y].parent.x && current.y == details[current.x][current.y].parent.y)){
-		current = details[current.x][current.y].parent;
-		addNode(&path, current, &count, &dim);
-	}
-	
-	printf("Chosen path:\n");
-	for(int i = count - 1; i >= 0; i--){
-		printf("\t(%d, %d)\n", path[i].x, path[i].y);
-	}
-	
-	*cPath = count;
-	return path;
+    Pair current = dst;
+    Pair * path = malloc(dim * sizeof(Pair));
+    addNode( & path, current, & count, & dim);
+    while (!(current.x == details[current.x][current.y].parent.x && current.y == details[current.x][current.y].parent.y)) {
+        current = details[current.x][current.y].parent;
+        addNode( & path, current, & count, & dim);
+    }
+
+    printf("Chosen path:\n");
+    for (int i = count - 1; i >= 0; i--) {
+        printf("\t(%d, %d)\n", path[i].x, path[i].y);
+    }
+
+    * cPath = count;
+    return path;
 }
 
-// A* algorithm
+// A* algorithm main function
 void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst) {
     int dimOpen = 1;
     int dimClosed = 1;
@@ -212,27 +219,27 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     Pair * nearNodes = NULL;
     Pair q;
 
-    // add starting node to open list
-    addNode(& openList, src, & countOpen, & dimOpen);
+    // Add starting node to open list
+    addNode( & openList, src, & countOpen, & dimOpen);
 
-    // se la openList non è vuota:
+    // While openList is not empty, do this
     while (countOpen != 0) {
-        quickSort(openList, details, 0, countOpen-1);
+        quickSort(openList, details, 0, countOpen - 1);
         q = openList[0];
         rmNode(openList, 0, & countOpen);
-        addNode(&closedList, q, &countClosed, &dimClosed);
+        addNode( & closedList, q, & countClosed, & dimClosed);
         nearNodes = setNearNodes(grid, details, q, & c);
 
         for (int i = 0; i < c; i++) {
             if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
-            	addNode(&closedList, dst, &countClosed, &dimClosed);
-            	details[dst.x][dst.y].parent = q;
+                addNode( & closedList, dst, & countClosed, & dimClosed);
+                details[dst.x][dst.y].parent = q;
                 printf("ARRIVED! YUHUUU!\n");
                 printf("Cost: %.3f\n", details[q.x][q.y].g + 1);
                 int cPath = 0;
-				Pair * path = printPath(grid, details, dst, &cPath);
+                Pair * path = printPath(grid, details, dst, & cPath);
                 printMap(grid, details, path, cPath);
-                
+
                 free(path);
                 free(openList);
                 free(closedList);
@@ -244,7 +251,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
                 hNew = calculateHValue(nearNodes[i], dst);
                 fNew = gNew + hNew;
                 if (details[nearNodes[i].x][nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x][nearNodes[i].y].f > fNew) {
-                    addNode(&openList, nearNodes[i], &countOpen, &dimOpen);
+                    addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
 
                     details[nearNodes[i].x][nearNodes[i].y].f = fNew;
                     details[nearNodes[i].x][nearNodes[i].y].g = gNew;
@@ -273,14 +280,14 @@ int main(int argc, char * argv[]) {
             atoi(argv[3]),
             atoi(argv[4])
         };
-        if (src.x == dst.x && src.y == dst.y){
-        	printf("The starting node is the same of the destination one.\n");
-        	return 2;
-		}
-		if ((src.x < 0 || src.x >= COL) || (src.y < 0 || src.y >= ROW) || (dst.x < 0 || dst.x >= COL) || (dst.y < 0 || dst.y >= ROW)) {
-			printf("Wrong starting or destination node.\n");
-			return 3;
-		}
+        if (src.x == dst.x && src.y == dst.y) {
+            printf("The starting node is the same of the destination one.\n");
+            return 2;
+        }
+        if ((src.x < 0 || src.x >= COL) || (src.y < 0 || src.y >= ROW) || (dst.x < 0 || dst.x >= COL) || (dst.y < 0 || dst.y >= ROW)) {
+            printf("Wrong starting or destination node.\n");
+            return 3;
+        }
         int grid[ROW][COL];
         int i = 0;
         Node details[ROW][COL];
