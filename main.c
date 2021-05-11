@@ -45,7 +45,6 @@ Pair* setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c) 
                         j
                     };
                     nearNodes[count]= tmp;
-                    details[i][j].parent = q;
                     count += 1;
                 }
             }
@@ -107,6 +106,9 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                 grid[i][j] = 1;
             } else {
                 grid[i][j] = BLOCK_NODE;
+                details[i][j].parent = (Pair) {
+                        -1, -1
+                    };
             }
 
             details[i][j].x = i;
@@ -160,25 +162,27 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     }
 }
 
-void cleanList(Pair * list) {
-
+void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path) {
+	
 }
 
-void printPath(int grid[ROW][COL], Pair * closedList) {
-	int c = 0;
-	for(int i = 0; i < ROW; i++) {
-        for(int j = 0; j < COL; j++) {
-        	if(grid[i][j] == 0)
-        		printf("- ");
-        	else if(i == closedList[c].x && j == closedList[c].y) {
-        		printf("+ ");
-        		c++;
-        	}
-        	else
-        		printf("  ");
-        }
-        printf("\n");
-    }
+Pair * printPath(int grid[ROW][COL], Node details[ROW][COL], Pair dst) {
+	int dim = 1;
+    int count = 0;
+	Pair current = dst;
+	Pair * path = malloc(dim * sizeof(Pair));
+	addNode(&path, current, &count, &dim);
+	while(!(current.x == details[current.x][current.y].parent.x && current.y == details[current.x][current.y].parent.y)){
+		current = details[current.x][current.y].parent;
+		addNode(&path, current, &count, &dim);
+	}
+	
+	printf("Chosen path:\n");
+	for(int i = count - 1; i >= 0; i--){
+		printf("\t(%d, %d)\n", path[i].x, path[i].y);
+	}
+	
+	return path;
 }
 
 // A* algorithm
@@ -197,7 +201,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     Pair q;
 
     // add starting node to open list
-    addNode(&openList, src, & countOpen, & dimOpen);
+    addNode(& openList, src, & countOpen, & dimOpen);
 
     // se la openList non è vuota:
     while (countOpen != 0) {
@@ -206,17 +210,18 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         q = openList[0];
         rmNode(openList, 0, & countOpen);
         addNode(&closedList, q, &countClosed, &dimClosed);
-        printf("(%d,%d)\n", q.x, q.y);
         // c)
         nearNodes = setNearNodes(grid, details, q, & c);
 
         for (int i = 0; i < c; i++) {
             if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
             	addNode(&closedList, dst, &countClosed, &dimClosed);
-                printf("(%d,%d)\n", dst.x, dst.y);
+            	details[dst.x][dst.y].parent = q;
                 printf("ARRIVED! YUHUUU!\n");
-                printf("Cost: %.3f\n", details[q.x][q.y].f + sqrt(pow(q.x - dst.x, 2) + pow(q.y - dst.y, 2)));
-                printPath(grid, closedList);
+                printf("Cost: %.3f\n", details[q.x][q.y].g + 1);
+				printPath(grid, details, dst);
+                //printMap(grid, details, dst);
+
                 
                 free(openList);
                 free(closedList);
@@ -270,11 +275,9 @@ int main(int argc, char * argv[]) {
         Node details[ROW][COL];
         srand(time(0));
         while (grid[src.x][src.y] == BLOCK_NODE || grid[dst.x][dst.y] == BLOCK_NODE) {
-            i++;
             initNodes(grid, details, src);
         }
         aStarSearch(grid, details, src, dst);
-        printf("\nGrid redone %d time(s)\n", i);
         return 0;
     } else {
         printf("Wrong parameters.\n");
