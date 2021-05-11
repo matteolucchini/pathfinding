@@ -160,6 +160,20 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     }
 }
 
+void printPath(int grid[ROW][COL], Pair * closedList) {
+	for(int i = 0; i < ROW; i++) {
+        for(int j = 0; j < COL; j++) {
+        	if(grid[i][j] == 0)
+        		printf("• ");
+        	else if(i == closedList[j].x && j == closedList[j].y)
+        		printf("X ");
+        	else
+        		printf("  ");
+        }
+        printf("\n");
+    }
+}
+
 // A* algorithm
 void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst) {
     int dimOpen = 1;
@@ -191,9 +205,12 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 
         for (int i = 0; i < c; i++) {
             if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
+            	addNode(&closedList, dst, &countClosed, &dimClosed);
                 printf("(%d,%d)\n", dst.x, dst.y);
                 printf("ARRIVED! YUHUUU!\n");
-                printf("Cost: %.3f", details[q.x][q.y].f + sqrt(pow(q.x - dst.x, 2) + pow(q.y - dst.y, 2)));
+                printf("Cost: %.3f\n", details[q.x][q.y].f + sqrt(pow(q.x - dst.x, 2) + pow(q.y - dst.y, 2)));
+                printPath(grid, closedList);
+                
                 free(openList);
                 free(closedList);
                 free(nearNodes);
