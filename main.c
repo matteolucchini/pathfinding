@@ -54,8 +54,8 @@ Pair* setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c) 
     return nearNodes;
 }
 
-bool isInList(Pair node, Pair * list, int * counter) {
-    for (int i = 0; i < * counter; i++) {
+bool isInList(Pair node, Pair * list, int counter) {
+    for (int i = 0; i < counter; i++) {
         if (list[i].x == node.x && list[i].y == node.y)
             return true;
     }
@@ -106,20 +106,19 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                 grid[i][j] = 1;
             } else {
                 grid[i][j] = BLOCK_NODE;
-                details[i][j].parent = (Pair) {
-                        -1, -1
-                    };
             }
 
             details[i][j].x = i;
             details[i][j].y = j;
 
         }
+        /*
         for (int j = 0; j < COL; j++)
             printf("%d ", grid[i][j]);
         printf("\n");
+        */
     }
-    printf("\n");
+    //printf("\n");
 }
 
 // rimuove i nodi dalla lista
@@ -162,13 +161,25 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     }
 }
 
-void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path) {
-	
+void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath) {
+	Pair tmp;
+	for (int i = 0; i < ROW; i++){
+		for (int j = 0; j < COL; j++){
+			if (grid[i][j] == 0)
+				putchar(0xdb);
+			else {
+				tmp = (Pair) {i,j};
+				if(isInList(tmp, path, cPath)) putchar('x');
+				else putchar('.');
+			}
+		}
+		putchar('\n');
+	}
 }
 
-Pair * printPath(int grid[ROW][COL], Node details[ROW][COL], Pair dst) {
+Pair * printPath(int grid[ROW][COL], Node details[ROW][COL], Pair dst, int * cPath) {
 	int dim = 1;
-    int count = 0;
+    int count = * cPath;
 	Pair current = dst;
 	Pair * path = malloc(dim * sizeof(Pair));
 	addNode(&path, current, &count, &dim);
@@ -182,6 +193,7 @@ Pair * printPath(int grid[ROW][COL], Node details[ROW][COL], Pair dst) {
 		printf("\t(%d, %d)\n", path[i].x, path[i].y);
 	}
 	
+	*cPath = count;
 	return path;
 }
 
@@ -205,12 +217,10 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 
     // se la openList non è vuota:
     while (countOpen != 0) {
-        // a,b)
         quickSort(openList, details, 0, countOpen-1);
         q = openList[0];
         rmNode(openList, 0, & countOpen);
         addNode(&closedList, q, &countClosed, &dimClosed);
-        // c)
         nearNodes = setNearNodes(grid, details, q, & c);
 
         for (int i = 0; i < c; i++) {
@@ -219,16 +229,17 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
             	details[dst.x][dst.y].parent = q;
                 printf("ARRIVED! YUHUUU!\n");
                 printf("Cost: %.3f\n", details[q.x][q.y].g + 1);
-				printPath(grid, details, dst);
-                //printMap(grid, details, dst);
-
+                int cPath = 0;
+				Pair * path = printPath(grid, details, dst, &cPath);
+                printMap(grid, details, path, cPath);
                 
+                free(path);
                 free(openList);
                 free(closedList);
                 free(nearNodes);
                 return;
             }
-            if (!isInList(nearNodes[i], closedList, &countClosed)) {
+            if (!isInList(nearNodes[i], closedList, countClosed)) {
                 gNew = details[q.x][q.y].g + 1.0;
                 hNew = calculateHValue(nearNodes[i], dst);
                 fNew = gNew + hNew;
