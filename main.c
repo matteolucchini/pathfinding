@@ -160,6 +160,10 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
     }
 }
 
+void cleanList(Pair * list) {
+
+}
+
 void printPath(int grid[ROW][COL], Pair * closedList) {
 	int c = 0;
 	for(int i = 0; i < ROW; i++) {
