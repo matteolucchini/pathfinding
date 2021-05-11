@@ -69,7 +69,6 @@ void addNode(Pair ** list, Pair node, int * counter, int * dim) {
     int c = *counter+1;
 
     if (d <= c) {
-        Pair * tmp;
         d *= 2;
         *dim = d;
         *list = realloc(*list, d * sizeof(Pair));
@@ -168,9 +167,6 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     int countOpen = 0;
     int countClosed = 0;
     int c = 0;
-    int rm_index;
-    float f_min;
-    float f;
     float gNew;
     float hNew;
     float fNew;
@@ -197,6 +193,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
             if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
                 printf("(%d,%d)\n", dst.x, dst.y);
                 printf("ARRIVED! YUHUUU!\n");
+                printf("Cost: %.3f", details[q.x][q.y].f + sqrt(pow(q.x - dst.x, 2) + pow(q.y - dst.y, 2)));
                 free(openList);
                 free(closedList);
                 free(nearNodes);
