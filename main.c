@@ -161,12 +161,15 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
 }
 
 void printPath(int grid[ROW][COL], Pair * closedList) {
+	int c = 0;
 	for(int i = 0; i < ROW; i++) {
         for(int j = 0; j < COL; j++) {
         	if(grid[i][j] == 0)
         		printf("- ");
-        	else if(i == closedList[j].x && j == closedList[j].y)
+        	else if(i == closedList[c].x && j == closedList[c].y) {
         		printf("+ ");
+        		c++;
+        	}
         	else
         		printf("  ");
         }
