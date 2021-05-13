@@ -167,7 +167,7 @@ void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath
     Pair tmp;
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
-            if (grid[i][j] == 0)
+            if (grid[i][j] == 0) 
                 putchar(0xdb);
             else {
                 tmp = (Pair) {
@@ -243,6 +243,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
                 free(openList);
                 free(closedList);
                 free(nearNodes);
+                putchar('\a'); // funny thing
                 return;
             }
             if (!isInList(nearNodes[i], closedList, countClosed)) {
