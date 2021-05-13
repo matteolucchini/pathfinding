@@ -5,11 +5,11 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
-#define ROW 500
-#define COL 500
+#define ROW 511
+#define COL 511
 #define BLOCK_NODE 0
-#define N_DIRECTION 8 	// This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
-						// If you really want to edit it anyway, good luck and many sons.
+#define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
+                        // If you really want to edit it anyway, good luck and many sons.
 
 // Definition of the structure of a pair
 typedef struct pair {
@@ -257,7 +257,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         nearNodes = NULL;
     }
     printf("Impossible to reach the destination!\n");
-	printMap(grid, details, NULL, 0);
+    printMap(grid, details, NULL, 0);
     free(openList);
     free(closedList);
     free(nearNodes);
