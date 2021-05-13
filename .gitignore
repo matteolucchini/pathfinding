@@ -361,6 +361,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+<<<<<<< HEAD
 .vscode/
 *.dSYM/
+=======
+
+.vscode
+*.main.dSYM
+main.dSYM/Contents/Resources/DWARF/main
+>>>>>>> beta
 main
