@@ -62,15 +62,6 @@ bool isInList(Pair node, Pair * list, int counter) {
     return false;
 }
 
-<<<<<<< HEAD
-// aggiunge i nodi in una lista
-void addNode(Pair * list, Pair node, int * counter, int * dim) {
-    * counter += 1;
-    printf("\ncounter: %d, dim: %d\n", *counter, *dim);
-    if (*dim < *counter) {
-        * dim = pow( * counter, 2);
-        list = realloc(list, * dim * sizeof(Pair));
-=======
 // This adds a node in a (dynamic) array (ex. openList)
 void addNode(Pair ** list, Pair node, int * counter, int * dim) {
     int d = * dim;
@@ -81,7 +72,6 @@ void addNode(Pair ** list, Pair node, int * counter, int * dim) {
         * dim = d;
         * list = realloc( * list, d * sizeof(Pair));
         if (list == NULL) exit(15);
->>>>>>> beta
     }
 
     ( * list)[c - 1] = node;
@@ -93,37 +83,7 @@ float calculateHValue(Pair current, Pair dest) {
     return (float) sqrt(pow(current.x - dest.x, 2) + pow(current.y - dest.y, 2));
 }
 
-<<<<<<< HEAD
-// d)
-bool computeNearNodes(Node details[ROW][COL], Pair * nearNodes, int c, Pair dst, Pair q, Pair * openList, Pair * closedList, int * counterOpen, int * counterClosed, int * dimOpen) {
-    float gNew;
-    float hNew;
-    float fNew;
-
-    for (int i = 0; i < c; i++) {
-        if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
-            printf("ARRIVATO YUHUUU!\n");
-            return true;
-        }
-        if (!isInList(nearNodes[i], closedList, counterClosed)) {
-            gNew = details[q.x][q.y].g + 1.0;
-            hNew = calculateHValue(nearNodes[i], dst);
-            fNew = gNew + hNew;
-            if (details[nearNodes[i].x][nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x][nearNodes[i].y].f > fNew) {
-                addNode(openList, nearNodes[i], counterOpen, dimOpen);
-                details[nearNodes[i].x][nearNodes[i].y].f = fNew;
-                details[nearNodes[i].x][nearNodes[i].y].g = gNew;
-                details[nearNodes[i].x][nearNodes[i].y].h = hNew;
-                details[nearNodes[i].x][nearNodes[i].y].parent = q;
-            }
-        }
-    }
-    return false;
-}
-
-=======
 // This initializes each node of the grid
->>>>>>> beta
 void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
@@ -296,13 +256,8 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         free(nearNodes);
         nearNodes = NULL;
     }
-<<<<<<< HEAD
-
-    printf("\nNope\n");
-=======
     printf("Impossible to reach the destination!\n");
 	printMap(grid, details, NULL, 0);
->>>>>>> beta
     free(openList);
     free(closedList);
     free(nearNodes);
