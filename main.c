@@ -282,7 +282,6 @@ int main(int argc, char * argv[]) {
             return 3;
         }
         int grid[ROW][COL];
-        int i = 0;
         Node details[ROW][COL];
         srand(time(0));
         initNodes(grid, details, src);
