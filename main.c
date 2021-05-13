@@ -237,6 +237,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
                 free(openList);
                 free(closedList);
                 free(nearNodes);
+                putchar('\a');
                 return;
             }
             if (!isInList(nearNodes[i], closedList, countClosed)) {
