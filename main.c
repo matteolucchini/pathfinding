@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
+#include <omp.h>
 #define ROW 511
 #define COL 511
 #define BLOCK_NODE 0
@@ -55,11 +56,16 @@ Pair * setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c)
 
 // This checks if a node is inside a list
 bool isInList(Pair node, Pair * list, int counter) {
-    for (int i = 0; i < counter; i++) {
-        if (list[i].x == node.x && list[i].y == node.y)
-            return true;
+    bool t = false;
+    omp_set_num_threads(8);
+    #pragma omp parallel
+    {
+        for (int i = 0; i < counter; i++) {
+            if (list[i].x == node.x && list[i].y == node.y)
+                t = true;
+        }
     }
-    return false;
+    return t;
 }
 
 // This adds a node in a (dynamic) array (ex. openList)
