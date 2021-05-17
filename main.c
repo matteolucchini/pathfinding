@@ -6,8 +6,8 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define ROW 511
-#define COL 511
+#define ROW 100
+#define COL 100
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -165,21 +165,26 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
 // This prints just the map
 void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath) {
     Pair tmp;
+    char map[ROW*COL+ROW];
+    int c = 0;
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
             if (grid[i][j] == 0) 
-                putchar(0xdb);
+                map[c] = 0xdb;
             else {
                 tmp = (Pair) {
                     i,
                     j
                 };
-                if (path!=NULL && isInList(tmp, path, cPath)) putchar('x');
-                else putchar('.');
+                if (path!=NULL && isInList(tmp, path, cPath)) map[c] = 'x';
+                else map[c] = '.';
             }
+            c++;
         }
-        putchar('\n');
+        map[c] = '\n';
+        c++;
     }
+    printf(map);
 }
 
 // This prints and returns the path that has been eventually found (NOT THE MAP)
