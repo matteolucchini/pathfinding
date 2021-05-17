@@ -6,8 +6,8 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define ROW 100
-#define COL 100
+#define ROW 200
+#define COL 200
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -184,6 +184,8 @@ void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath
         map[c] = '\n';
         c++;
     }
+	
+	map[c] = '\0';
     printf(map);
 }
 
