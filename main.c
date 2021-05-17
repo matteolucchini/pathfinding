@@ -5,8 +5,8 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
-#define ROW 100
-#define COL 100
+#define ROW 200
+#define COL 200
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -159,7 +159,7 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
 // This prints just the map
 void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath) {
     Pair tmp;
-    char map[ROW*COL+ROW];
+    char map[ROW*COL+ROW+1];
     int c = 0;
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
@@ -178,6 +178,7 @@ void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath
         map[c] = '\n';
         c++;
     }
+    map[c] = '\0';
     printf(map);
 }
 
