@@ -5,8 +5,8 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
-#define ROW 10
-#define COL 10
+#define ROW 200
+#define COL 200
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
