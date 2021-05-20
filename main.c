@@ -234,6 +234,9 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     Pair * closedList = malloc(dimClosed * sizeof(Pair));
     Pair * nearNodes = NULL;
     Pair q;
+    
+    omp_set_dynamic(0);              // Explicitly disable dynamic teams
+    omp_set_num_threads(4); // Use N threads for all parallel regions
 
     // Add starting node to open list
     addNode( & openList, src, & countOpen, & dimOpen);
