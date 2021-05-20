@@ -179,7 +179,7 @@ void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath
         c++;
     }
     map[c] = '\0';
-    printf(map);
+    printf("%s", map);
 }
 
 // This prints and returns the path that has been eventually found (NOT THE MAP)
