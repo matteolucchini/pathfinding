@@ -242,6 +242,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
     while (countOpen != 0) {
     	#pragma omp parallel
     	{
+    		#pragma omp single
     		quickSort(openList, details, 0, countOpen - 1);
         }
         q = openList[0];
