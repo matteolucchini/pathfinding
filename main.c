@@ -6,8 +6,9 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define ROW 200
-#define COL 200
+#define TASK_SIZE 100
+#define ROW 511
+#define COL 511
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -157,7 +158,9 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
             }
         l--;
         swap(array, begin, l);
+        #pragma omp task shared(array) if(end - begin > TASK_SIZE)
         quickSort(array, details, begin, l);
+        #pragma omp task shared(array) if(end - begin > TASK_SIZE)
         quickSort(array, details, r, end);
     }
 }
@@ -230,7 +233,14 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 
     // While openList is not empty, do this
     while (countOpen != 0) {
-        quickSort(openList, details, 0, countOpen - 1);
+    	double begin = omp_get_wtime();
+    	#pragma omp parallel
+    	{
+    		#pragma omp single
+        	quickSort(openList, details, 0, countOpen - 1);
+        }
+        double end = omp_get_wtime();
+        printf("Time: %f (s) \n", end-begin);
         q = openList[0];
         rmNode(openList, 0, & countOpen);
         addNode( & closedList, q, & countClosed, & dimClosed);
