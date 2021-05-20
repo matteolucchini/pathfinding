@@ -56,17 +56,24 @@ Pair * setNearNodes(int grid[ROW][COL], Node details[ROW][COL], Pair q, int * c)
 }
 
 // This checks if a node is inside a list
+// bool isInList(Pair node, Pair * list, int counter) {
+//     bool t = false;
+//     omp_set_num_threads(8);
+//     #pragma omp parallel
+//     {
+//         for (int i = 0; i < counter; i++) {
+//             if (list[i].x == node.x && list[i].y == node.y)
+//                 t = true;
+//         }
+//     }
+//     return t;
+// }
 bool isInList(Pair node, Pair * list, int counter) {
-    bool t = false;
-    omp_set_num_threads(8);
-    #pragma omp parallel
-    {
-        for (int i = 0; i < counter; i++) {
-            if (list[i].x == node.x && list[i].y == node.y)
-                t = true;
-        }
+    for (int i = 0; i < counter; i++) {
+        if (list[i].x == node.x && list[i].y == node.y)
+            return true;
     }
-    return t;
+    return false;
 }
 
 // This adds a node in a (dynamic) array (ex. openList)
@@ -233,10 +240,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 
     // While openList is not empty, do this
     while (countOpen != 0) {
-    	double begin = omp_get_wtime();
     	quickSort(openList, details, 0, countOpen - 1);
-        double end = omp_get_wtime();
-        printf("Time: %f (s) \n", end-begin);
         q = openList[0];
         rmNode(openList, 0, & countOpen);
         addNode( & closedList, q, & countClosed, & dimClosed);
@@ -308,7 +312,10 @@ int main(int argc, char * argv[]) {
         while (grid[src.x][src.y] == BLOCK_NODE || grid[dst.x][dst.y] == BLOCK_NODE) {
             initNodes(grid, details, src);
         }
+		double begin = omp_get_wtime();
         aStarSearch(grid, details, src, dst);
+        double end = omp_get_wtime();
+        printf("Time: %f (s) \n", end-begin);
         return 0;
     } else {
         printf("Wrong parameters.\n");
