@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
+#include <omp.h>
 #define ROW 200
 #define COL 200
 #define BLOCK_NODE 0
@@ -295,7 +296,10 @@ int main(int argc, char * argv[]) {
         while (grid[src.x][src.y] == BLOCK_NODE || grid[dst.x][dst.y] == BLOCK_NODE) {
             initNodes(grid, details, src);
         }
+        double begin = omp_get_wtime();
         aStarSearch(grid, details, src, dst);
+        double end = omp_get_wtime();
+        printf("Time: %f (s)\n", end-begin);
         return 0;
     } else {
         printf("Wrong parameters.\n");
