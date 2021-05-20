@@ -240,7 +240,10 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
 
     // While openList is not empty, do this
     while (countOpen != 0) {
-    	quickSort(openList, details, 0, countOpen - 1);
+    	#pragma omp parallel
+    	{
+    		quickSort(openList, details, 0, countOpen - 1);
+        }
         q = openList[0];
         rmNode(openList, 0, & countOpen);
         addNode( & closedList, q, & countClosed, & dimClosed);
