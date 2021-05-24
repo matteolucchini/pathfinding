@@ -7,8 +7,8 @@
 #include <float.h>
 #include <omp.h>
 #define TASK_SIZE 100
-#define ROW 200
-#define COL 200
+#define ROW 500
+#define COL 500
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
