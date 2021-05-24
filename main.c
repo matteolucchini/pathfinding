@@ -6,8 +6,8 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define ROW 500
-#define COL 500
+#define ROW 1000
+#define COL 1000
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -204,8 +204,8 @@ Pair * printPath(int grid[ROW][COL], Node details[ROW][COL], Pair dst, int * cPa
     return path;
 }
 
-// A* algorithm main function
-void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst) {
+// A* algorithm main function (x * ROW + y) --> elemento x,y
+void aStarSearch(int * grid, Node details[ROW][COL], Pair src, Pair dst) {
     int dimOpen = 1;
     int dimClosed = 1;
     int countOpen = 0;
@@ -238,7 +238,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
                 printf("Cost: %.3f\n", details[q.x][q.y].g + 1);
                 int cPath = 0;
                 Pair * path = printPath(grid, details, dst, & cPath);
-                printMap(grid, details, path, cPath);
+                //printMap(grid, details, path, cPath);
 
                 free(path);
                 free(openList);
