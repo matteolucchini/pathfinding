@@ -14,12 +14,8 @@ void buildMatrix(int row, int col) {
 	        for (int j = 0; j < col; j++) {
 	            if ((rand() & 1) | (rand() & 1)) {
 	            	fprintf(file, "%d", 1);
-	            	if (j < col - 1)
-	            		fprintf(file, " ");
 	            } else {
 	            	fprintf(file, "%d", 0);
-	            	if (j < col - 1)
-	            		fprintf(file, " ");
 	            }
 	        }
 	        fprintf(file, "\n");
