@@ -8,9 +8,9 @@
 #include <omp.h>
 #define TASK_SIZE 100
 #define NUM_THREADS 8
-#define DEBUG true
-#define ROW 10000
-#define COL 10000
+#define DEBUG false
+#define ROW 10
+#define COL 10
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -372,7 +372,7 @@ int main(int argc, char * argv[]) {
             printf("Wrong starting or destination node.\n");
             return 3;
         }
-        int * grid = malloc(ROW*COL * sizeof(int));
+        int * grid = calloc(ROW*COL, sizeof(int));
         Node *  details = malloc(ROW*COL * sizeof(Node));
         srand(time(0));
         if(DEBUG)
