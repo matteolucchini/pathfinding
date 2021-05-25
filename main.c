@@ -6,6 +6,7 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
+#define DEBUG true
 #define ROW 10
 #define COL 10
 #define BLOCK_NODE 0
@@ -106,6 +107,53 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                     };
                 }
                 grid[i][j] = 1;
+            }
+
+            details[i][j].x = i;
+            details[i][j].y = j;
+            
+        }
+    }
+}
+
+void readMatrix(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
+	FILE * f;
+	f = fopen("matrix.txt","r");
+	int i = 0;
+	char * line = malloc((COL+1)*sizeof(char));
+	while (fgets(line,sizeof(line),f) != NULL){
+		
+	}
+	fclose(f);        
+	free(line);
+	
+	for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+        	printf("%d",grid[i][j]);
+		}
+		printf("\n");
+	}	
+	
+	
+    for (int i = 0; i < ROW; i++) {
+        for (int j = 0; j < COL; j++) {
+            if (grid[i][j]) { // gives 1 with probability of 75%, gives 0 with probability of 25%
+                if (i == src.x && j == src.y) {
+                    details[i][j].g = 0;
+                    details[i][j].h = 0;
+                    details[i][j].f = 0;
+                    details[i][j].parent = (Pair) {
+                        i, j
+                    };
+
+                } else {
+                    details[i][j].g = FLT_MAX;
+                    details[i][j].h = FLT_MAX;
+                    details[i][j].f = FLT_MAX;
+                    details[i][j].parent = (Pair) {
+                        -1, -1
+                    };
+                }
             }
 
             details[i][j].x = i;
@@ -291,10 +339,14 @@ int main(int argc, char * argv[]) {
         int * grid = malloc(ROW*COL * sizeof(int));
         Node *  details = malloc(ROW*COL * sizeof(Node));
         srand(time(0));
-        initNodes(grid, details, src);
-        while (grid[(src.x*ROW) + src.y] == BLOCK_NODE || grid[(dst.x*ROW) + dst.y] == BLOCK_NODE) {
-            initNodes(grid, details, src);
-        }
+        if(DEBUG)
+        	readMatrix(grid, details, src);
+        else{
+	        initNodes(grid, details, src);
+	        while (grid[(src.x*ROW) + src.y] == BLOCK_NODE || grid[(dst.x*ROW) + dst.y] == BLOCK_NODE) {
+	            initNodes(grid, details, src);
+	        }
+		}
         double begin = omp_get_wtime();
         aStarSearch(grid, details, src, dst);
         double end = omp_get_wtime();
