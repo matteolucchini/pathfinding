@@ -7,8 +7,8 @@
 #include <float.h>
 #include <omp.h>
 #define DEBUG true
-#define ROW 10
-#define COL 10
+#define ROW 10000
+#define COL 10000
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -117,6 +117,7 @@ void initNodes(int * grid, Node * details, Pair src) {
 }
 
 void readMatrix(int * grid, Node * details, Pair src) {
+	printf("Reading the file...\n");
 	FILE * f;
 	f = fopen("matrix.txt","r");
 	int c;
@@ -135,12 +136,15 @@ void readMatrix(int * grid, Node * details, Pair src) {
 	}
 	fclose(f);
 	
+	/*
 	for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
         	printf("%d",grid[i*ROW + j]);
 		}
 		printf("\n");
-	}	
+	}
+	*/
+	printf("Done!\n");	
 	
 	
     for (int i = 0; i < ROW; i++) {
@@ -260,7 +264,6 @@ Pair * printPath(Node * details, Pair dst, int * cPath) {
 }
 
 // A* algorithm main function
-// x*ROW + y
 void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
     int dimOpen = 1;
     int dimClosed = 1;
