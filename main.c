@@ -119,13 +119,18 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
 void readMatrix(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
 	FILE * f;
 	f = fopen("matrix.txt","r");
+	int c;
 	int i = 0;
-	char * line = malloc((COL+1)*sizeof(char));
-	while (fgets(line,sizeof(line),f) != NULL){
-		
+	int j = 0;
+	while(c = fgetc(f) != EOF) {
+		grid[i][j] = c;
+		j++;
+		if(j == COL - 1) {
+			i++;
+			j = 0;
+		}
 	}
-	fclose(f);        
-	free(line);
+	fclose(f);
 	
 	for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
