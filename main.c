@@ -6,8 +6,8 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define ROW 20000
-#define COL 20000
+#define ROW 10
+#define COL 10
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -106,8 +106,6 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                     };
                 }
                 grid[i][j] = 1;
-            } else {
-                grid[i][j] = BLOCK_NODE;
             }
 
             details[i][j].x = i;
@@ -158,6 +156,7 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
 }
 
 // This prints just the map
+// Abbandoned, since we are dealing with really big matrices. So it is obsolete and may not work
 void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath) {
     Pair tmp;
     char * map = malloc((ROW*COL+ROW+1)*sizeof(char));
@@ -204,7 +203,7 @@ Pair * printPath(int grid[ROW][COL], Node details[ROW][COL], Pair dst, int * cPa
     return path;
 }
 
-// A* algorithm main function (x * ROW + y) --> elemento x,y
+// A* algorithm main function
 void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst) {
     int dimOpen = 1;
     int dimClosed = 1;
@@ -265,7 +264,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         nearNodes = NULL;
     }
     printf("Impossible to reach the destination!\n");
-    printMap(grid, details, NULL, 0);
+    //printMap(grid, details, NULL, 0);
     free(openList);
     free(closedList);
     free(nearNodes);
@@ -292,7 +291,6 @@ int main(int argc, char * argv[]) {
         int * grid = malloc(ROW*COL * sizeof(int));
         Node *  details = malloc(ROW*COL * sizeof(Node));
         srand(time(0));
-        //(x * ROW + y)
         initNodes(grid, details, src);
         while (grid[(src.x*ROW) + src.y] == BLOCK_NODE || grid[(dst.x*ROW) + dst.y] == BLOCK_NODE) {
             initNodes(grid, details, src);
