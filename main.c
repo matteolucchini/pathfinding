@@ -7,8 +7,8 @@
 #include <float.h>
 #include <omp.h>
 #define TASK_SIZE 100
-#define ROW 500
-#define COL 500
+#define ROW 10000
+#define COL 10000
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -119,8 +119,6 @@ void initNodes(int grid[ROW][COL], Node details[ROW][COL], Pair src) {
                     };
                 }
                 grid[i][j] = 1;
-            } else {
-                grid[i][j] = BLOCK_NODE;
             }
 
             details[i][j].x = i;
@@ -173,9 +171,10 @@ void quickSort(Pair * array, Node details[ROW][COL], int begin, int end) {
 }
 
 // This prints just the map
+// Abbandoned, since we are dealing with really big matrices. So it is obsolete and may not work
 void printMap(int grid[ROW][COL], Node details[ROW][COL], Pair * path, int cPath) {
     Pair tmp;
-    char map[ROW*COL+ROW];
+	char * map = malloc((ROW*COL+ROW+1)*sizeof(char));
     int c = 0;
     for (int i = 0; i < ROW; i++) {
         for (int j = 0; j < COL; j++) {
@@ -261,7 +260,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
                 printf("Cost: %.3f\n", details[q.x][q.y].g + 1);
                 int cPath = 0;
                 Pair * path = printPath(grid, details, dst, & cPath);
-                printMap(grid, details, path, cPath);
+                //printMap(grid, details, path, cPath);
 
                 free(path);
                 free(openList);
@@ -288,7 +287,7 @@ void aStarSearch(int grid[ROW][COL], Node details[ROW][COL], Pair src, Pair dst)
         nearNodes = NULL;
     }
     printf("Impossible to reach the destination!\n");
-    printMap(grid, details, NULL, 0);
+    //printMap(grid, details, NULL, 0);
     free(openList);
     free(closedList);
     free(nearNodes);
@@ -312,17 +311,19 @@ int main(int argc, char * argv[]) {
             printf("Wrong starting or destination node.\n");
             return 3;
         }
-        int grid[ROW][COL];
-        Node details[ROW][COL];
+        int * grid = malloc(ROW*COL * sizeof(int));
+        Node *  details = malloc(ROW*COL * sizeof(Node));
         srand(time(0));
         initNodes(grid, details, src);
-        while (grid[src.x][src.y] == BLOCK_NODE || grid[dst.x][dst.y] == BLOCK_NODE) {
+        while (grid[(src.x*ROW) + src.y] == BLOCK_NODE || grid[(dst.x*ROW) + dst.y] == BLOCK_NODE) {
             initNodes(grid, details, src);
         }
-		double begin = omp_get_wtime();
+        double begin = omp_get_wtime();
         aStarSearch(grid, details, src, dst);
         double end = omp_get_wtime();
-        printf("Time: %f (s) \n", end-begin);
+        printf("Time: %f (s)\n", end-begin);
+        free(grid);
+        free(details);
         return 0;
     } else {
         printf("Wrong parameters.\n");
