@@ -8,9 +8,9 @@
 #include <omp.h>
 #define TASK_SIZE 100
 #define NUM_THREADS 8
-#define DEBUG false
-#define ROW 10
-#define COL 10
+#define DEBUG true
+// #define ROW 10
+// #define COL 10
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -34,15 +34,15 @@ typedef struct node {
 Node;
 
 // This returns all the neighboring nodes of a given node q
-Pair * setNearNodes(int * grid, Pair q, int * c) {
+Pair * setNearNodes(int * grid, Pair q, int * c, int row, int col) {
     Pair * nearNodes = malloc(N_DIRECTION * sizeof(Pair));
     int count = 0;
     int x = q.x - 1;
     int y = q.y - 1;
     for (int i = x; i <= x + 2; i++) {
         for (int j = y; j <= y + 2; j++) {
-            if ((i >= 0 && i < COL) && (j >= 0 && j < ROW)) {
-                if (!(i == q.x && j == q.y) && grid[i*ROW + j] == 1) {
+            if ((i >= 0 && i < col) && (j >= 0 && j < row)) {
+                if (!(i == q.x && j == q.y) && grid[i*row + j] == 1) {
                     Pair tmp = {
                         i,
                         j
@@ -100,37 +100,37 @@ float calculateHValue(Pair current, Pair dest) {
 }
 
 // This initializes each node of the grid
-void initNodes(int * grid, Node * details, Pair src) {
-    for (int i = 0; i < ROW; i++) {
-        for (int j = 0; j < COL; j++) {
+void initNodes(int * grid, Node * details, Pair src, int row, int col) {
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
             if ((rand() & 1) | (rand() & 1)) { // gives 1 with probability of 75%, gives 0 with probability of 25%
                 if (i == src.x && j == src.y) {
-                    details[i*ROW + j].g = 0;
-                    details[i*ROW + j].h = 0;
-                    details[i*ROW + j].f = 0;
-                    details[i*ROW + j].parent = (Pair) {
+                    details[i*row + j].g = 0;
+                    details[i*row + j].h = 0;
+                    details[i*row + j].f = 0;
+                    details[i*row + j].parent = (Pair) {
                         i, j
                     };
 
                 } else {
-                    details[i*ROW + j].g = FLT_MAX;
-                    details[i*ROW + j].h = FLT_MAX;
-                    details[i*ROW + j].f = FLT_MAX;
-                    details[i*ROW + j].parent = (Pair) {
+                    details[i*row + j].g = FLT_MAX;
+                    details[i*row + j].h = FLT_MAX;
+                    details[i*row + j].f = FLT_MAX;
+                    details[i*row + j].parent = (Pair) {
                         -1, -1
                     };
                 }
-                grid[i*ROW + j] = 1;
+                grid[i*row + j] = 1;
             }
 
-            details[i*ROW + j].x = i;
-            details[i*ROW + j].y = j;
+            details[i*row + j].x = i;
+            details[i*row + j].y = j;
             
         }
     }
 }
 
-void readMatrix(int * grid, Node * details, Pair src) {
+void readMatrix(int * grid, Node * details, Pair src, int row, int col) {
 	printf("Reading the file...\n");
 	FILE * f;
 	f = fopen("matrix.txt","r");
@@ -140,7 +140,7 @@ void readMatrix(int * grid, Node * details, Pair src) {
 	c = fgetc(f);
 	while(c != EOF) {
 		if(c != '\n'){
-			grid[i*ROW + j] = c - 48;
+			grid[i*row + j] = c - 48;
 			j++;
 		} else {
 			i++;
@@ -161,29 +161,29 @@ void readMatrix(int * grid, Node * details, Pair src) {
 	printf("Done!\n");	
 	
 	
-    for (int i = 0; i < ROW; i++) {
-        for (int j = 0; j < COL; j++) {
-            if (grid[i*ROW + j]) { // gives 1 with probability of 75%, gives 0 with probability of 25%
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < row; j++) {
+            if (grid[i*row + j]) { // gives 1 with probability of 75%, gives 0 with probability of 25%
                 if (i == src.x && j == src.y) {
-                    details[i*ROW + j].g = 0;
-                    details[i*ROW + j].h = 0;
-                    details[i*ROW + j].f = 0;
-                    details[i*ROW + j].parent = (Pair) {
+                    details[i*row + j].g = 0;
+                    details[i*row + j].h = 0;
+                    details[i*row + j].f = 0;
+                    details[i*row + j].parent = (Pair) {
                         i, j
                     };
 
                 } else {
-                    details[i*ROW + j].g = FLT_MAX;
-                    details[i*ROW + j].h = FLT_MAX;
-                    details[i*ROW + j].f = FLT_MAX;
-                    details[i*ROW + j].parent = (Pair) {
+                    details[i*row + j].g = FLT_MAX;
+                    details[i*row + j].h = FLT_MAX;
+                    details[i*row + j].f = FLT_MAX;
+                    details[i*row + j].parent = (Pair) {
                         -1, -1
                     };
                 }
             }
 
-            details[i*ROW + j].x = i;
-            details[i*ROW + j].y = j;
+            details[i*row + j].x = i;
+            details[i*row + j].y = j;
             
         }
     }
@@ -208,15 +208,15 @@ void swap(Pair * array, int l, int r) {
 }
 
 // (Source wikiversity) This orders the array in decrescent order wrt the cost f
-void quickSort(Pair * array, Node * details, int begin, int end) {
+void quickSort(Pair * array, Node * details, int begin, int end, int row) {
     float pivot;
     int l, r;
     if (end > begin) {
-        pivot = details[array[begin].x*ROW + array[begin].y].f;
+        pivot = details[array[begin].x*row + array[begin].y].f;
         l = begin + 1;
         r = end + 1;
         while (l < r)
-            if (details[array[l].x*ROW + array[l].y].f < pivot)
+            if (details[array[l].x*row + array[l].y].f < pivot)
                 l++;
             else {
                 r--;
@@ -225,49 +225,49 @@ void quickSort(Pair * array, Node * details, int begin, int end) {
         l--;
         swap(array, begin, l);
         #pragma omp task shared(array) if(end - begin > TASK_SIZE)
-        quickSort(array, details, begin, l);
+        quickSort(array, details, begin, l, row);
         #pragma omp task shared(array) if(end - begin > TASK_SIZE)
-        quickSort(array, details, r, end);
+        quickSort(array, details, r, end, row);
     }
 }
 
 // This prints just the map
 // Abbandoned, since we are dealing with really big matrices. So it is obsolete and may not work
-void printMap(int * grid, Pair * path, int cPath) {
-    Pair tmp;
-	char * map = malloc((ROW*COL+ROW+1)*sizeof(char));
-    int c = 0;
-    for (int i = 0; i < ROW; i++) {
-        for (int j = 0; j < COL; j++) {
-            if (grid[i*ROW + j] == 0) 
-                map[c] = 0xdb;
-            else {
-                tmp = (Pair) {
-                    i,
-                    j
-                };
-                if (path!=NULL && isInList(tmp, path, cPath)) map[c] = 'x';
-                else map[c] = '.';
-            }
-            c++;
-        }
-        map[c] = '\n';
-        c++;
-    }
+// void printMap(int * grid, Pair * path, int cPath) {
+//     Pair tmp;
+// 	char * map = malloc((ROW*COL+ROW+1)*sizeof(char));
+//     int c = 0;
+//     for (int i = 0; i < ROW; i++) {
+//         for (int j = 0; j < COL; j++) {
+//             if (grid[i*ROW + j] == 0) 
+//                 map[c] = 0xdb;
+//             else {
+//                 tmp = (Pair) {
+//                     i,
+//                     j
+//                 };
+//                 if (path!=NULL && isInList(tmp, path, cPath)) map[c] = 'x';
+//                 else map[c] = '.';
+//             }
+//             c++;
+//         }
+//         map[c] = '\n';
+//         c++;
+//     }
 	
-	map[c] = '\0';
-    printf("%s", map);
-}
+// 	map[c] = '\0';
+//     printf("%s", map);
+// }
 
 // This prints and returns the path that has been eventually found (NOT THE MAP)
-Pair * printPath(Node * details, Pair dst, int * cPath) {
+Pair * printPath(Node * details, Pair dst, int * cPath, int row) {
     int dim = 1;
     int count = * cPath;
     Pair current = dst;
     Pair * path = malloc(dim * sizeof(Pair));
     addNode( & path, current, & count, & dim);
-    while (!(current.x == details[current.x*ROW + current.y].parent.x && current.y == details[current.x*ROW + current.y].parent.y)) {
-        current = details[current.x*ROW + current.y].parent;
+    while (!(current.x == details[current.x*row + current.y].parent.x && current.y == details[current.x*row + current.y].parent.y)) {
+        current = details[current.x*row + current.y].parent;
         addNode( & path, current, & count, & dim);
     }
 
@@ -281,7 +281,7 @@ Pair * printPath(Node * details, Pair dst, int * cPath) {
 }
 
 // A* algorithm main function
-void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
+void aStarSearch(int * grid, Node * details, Pair src, Pair dst, int row, int col) {
     int dimOpen = 1;
     int dimClosed = 1;
     int countOpen = 0;
@@ -306,21 +306,21 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
     	#pragma omp parallel
     	{
     		#pragma omp single
-    		quickSort(openList, details, 0, countOpen - 1);
+    		quickSort(openList, details, 0, countOpen - 1, row);
         }
         q = openList[0];
         rmNode(openList, 0, & countOpen);
         addNode( & closedList, q, & countClosed, & dimClosed);
-        nearNodes = setNearNodes(grid, q, & c);
+        nearNodes = setNearNodes(grid, q, & c, row, col);
 
         for (int i = 0; i < c; i++) {
             if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
                 addNode( & closedList, dst, & countClosed, & dimClosed);
-                details[dst.x*ROW + dst.y].parent = q;
+                details[dst.x*row + dst.y].parent = q;
                 printf("ARRIVED! YUHUUU!\n");
-                printf("Cost: %.3f\n", details[q.x*ROW + q.y].g + 1);
+                printf("Cost: %.3f\n", details[q.x*row + q.y].g + 1);
                 int cPath = 0;
-                Pair * path = printPath(details, dst, & cPath);
+                Pair * path = printPath(details, dst, & cPath, row);
                 //printMap(grid, details, path, cPath);
 
                 free(path);
@@ -331,16 +331,16 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
                 return;
             }
             if (!isInList(nearNodes[i], closedList, countClosed)) {
-                gNew = details[q.x*ROW + q.y].g + 1.0;
+                gNew = details[q.x*row + q.y].g + 1.0;
                 hNew = calculateHValue(nearNodes[i], dst);
                 fNew = gNew + hNew;
-                if (details[nearNodes[i].x*ROW + nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x*ROW + nearNodes[i].y].f > fNew) {
+                if (details[nearNodes[i].x*row + nearNodes[i].y].f == FLT_MAX || details[nearNodes[i].x*row + nearNodes[i].y].f > fNew) {
                     addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
 
-                    details[nearNodes[i].x*ROW + nearNodes[i].y].f = fNew;
-                    details[nearNodes[i].x*ROW + nearNodes[i].y].g = gNew;
-                    details[nearNodes[i].x*ROW + nearNodes[i].y].h = hNew;
-                    details[nearNodes[i].x*ROW + nearNodes[i].y].parent = q;
+                    details[nearNodes[i].x*row + nearNodes[i].y].f = fNew;
+                    details[nearNodes[i].x*row + nearNodes[i].y].g = gNew;
+                    details[nearNodes[i].x*row + nearNodes[i].y].h = hNew;
+                    details[nearNodes[i].x*row + nearNodes[i].y].parent = q;
                 }
             }
         }
@@ -355,7 +355,9 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
 }
 
 int main(int argc, char * argv[]) {
-    if (argc >= 5) {
+    if (argc >= 7) {
+        int row = atoi(argv[5]);
+        int col = atoi(argv[6]);
         Pair src = {
             atoi(argv[1]),
             atoi(argv[2])
@@ -368,23 +370,23 @@ int main(int argc, char * argv[]) {
             printf("The starting node is the same of the destination one.\n");
             return 2;
         }
-        if ((src.x < 0 || src.x >= COL) || (src.y < 0 || src.y >= ROW) || (dst.x < 0 || dst.x >= COL) || (dst.y < 0 || dst.y >= ROW)) {
+        if ((src.x < 0 || src.x >= col) || (src.y < 0 || src.y >= row) || (dst.x < 0 || dst.x >= col) || (dst.y < 0 || dst.y >= row)) {
             printf("Wrong starting or destination node.\n");
             return 3;
         }
-        int * grid = calloc(ROW*COL, sizeof(int));
-        Node *  details = malloc(ROW*COL * sizeof(Node));
+        int * grid = calloc(row*col, sizeof(int));
+        Node *  details = malloc(row*col * sizeof(Node));
         srand(time(0));
         if(DEBUG)
-        	readMatrix(grid, details, src);
+        	readMatrix(grid, details, src, row, col);
         else{
-	        initNodes(grid, details, src);
-	        while (grid[(src.x*ROW) + src.y] == BLOCK_NODE || grid[(dst.x*ROW) + dst.y] == BLOCK_NODE) {
-	            initNodes(grid, details, src);
+	        initNodes(grid, details, src, row, col);
+	        while (grid[(src.x*row) + src.y] == BLOCK_NODE || grid[(dst.x*row) + dst.y] == BLOCK_NODE) {
+	            initNodes(grid, details, src, row, col);
 	        }
 		}
         double begin = omp_get_wtime();
-        aStarSearch(grid, details, src, dst);
+        aStarSearch(grid, details, src, dst, row, col);
         double end = omp_get_wtime();
         printf("Time: %f (s)\n", end-begin);
         free(grid);
