@@ -6,7 +6,7 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define DEBUG false
+#define DEBUG true
 // #define ROW 10
 // #define COL 10
 #define BLOCK_NODE 0
