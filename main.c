@@ -7,10 +7,7 @@
 #include <float.h>
 #include <omp.h>
 #define TASK_SIZE 100
-#define NUM_THREADS 8
-#define DEBUG true
-// #define ROW 10
-// #define COL 10
+#define DEBUG false
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -103,6 +100,8 @@ float calculateHValue(Pair current, Pair dest) {
 
 // This initializes each node of the grid
 void initNodes(int * grid, Node * details, Pair src) {
+    printf("Generating map...\n");
+    #pragma omp parallel for
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             if ((rand() & 1) | (rand() & 1)) { // gives 1 with probability of 75%, gives 0 with probability of 25%
@@ -130,6 +129,7 @@ void initNodes(int * grid, Node * details, Pair src) {
             
         }
     }
+    printf("Done!\n");
 }
 
 void readMatrix(int * grid, Node * details, Pair src) {
@@ -388,6 +388,7 @@ int main(int argc, char * argv[]) {
 	            initNodes(grid, details, src);
 	        }
 		}
+        printf("Start!\n");
         double begin = omp_get_wtime();
         aStarSearch(grid, details, src, dst);
         double end = omp_get_wtime();
