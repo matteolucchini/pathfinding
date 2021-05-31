@@ -5,7 +5,6 @@
 #include <math.h>
 #include <string.h>
 #include <float.h>
-#include <omp.h>
 #define DEBUG true
 // #define ROW 10
 // #define COL 10
@@ -364,10 +363,10 @@ int main(int argc, char * argv[]) {
 	            initNodes(grid, details, src);
 	        }
 		}
-        double begin = omp_get_wtime();
+        clock_t begin = clock();
         aStarSearch(grid, details, src, dst);
-        double end = omp_get_wtime();
-        printf("Time: %f (s)\n", end-begin);
+        clock_t end = clock();
+        printf("Time: %f (s)\n", (double)(end-begin) / CLOCKS_PER_SEC);
         free(grid);
         free(details);
         return 0;
