@@ -6,8 +6,6 @@
 #include <string.h>
 #include <float.h>
 #define DEBUG true
-// #define ROW 10
-// #define COL 10
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -88,6 +86,7 @@ float calculateHValue(Pair current, Pair dest) {
 
 // This initializes each node of the grid
 void initNodes(int * grid, Node * details, Pair src) {
+    printf("Generating map...\n");
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             if ((rand() & 1) | (rand() & 1)) { // gives 1 with probability of 75%, gives 0 with probability of 25%
@@ -115,6 +114,7 @@ void initNodes(int * grid, Node * details, Pair src) {
             
         }
     }
+    printf("Done!\n");
 }
 
 void readMatrix(int * grid, Node * details, Pair src) {
@@ -360,9 +360,11 @@ int main(int argc, char * argv[]) {
         else{
 	        initNodes(grid, details, src);
 	        while (grid[(src.x*row) + src.y] == BLOCK_NODE || grid[(dst.x*row) + dst.y] == BLOCK_NODE) {
-	            initNodes(grid, details, src);
+                printf("Map not feasible!\n");
+                initNodes(grid, details, src);
 	        }
 		}
+        printf("Start!\n");
         clock_t begin = clock();
         aStarSearch(grid, details, src, dst);
         clock_t end = clock();
