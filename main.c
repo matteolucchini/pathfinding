@@ -31,8 +31,10 @@ typedef struct node {
 }
 Node;
 
+int row, col;
+
 // This returns all the neighboring nodes of a given node q
-Pair * setNearNodes(int * grid, Pair q, int * c, int row, int col) {
+Pair * setNearNodes(int * grid, Pair q, int * c) {
     Pair * nearNodes = malloc(N_DIRECTION * sizeof(Pair));
     int count = 0;
     int x = q.x - 1;
@@ -86,7 +88,7 @@ float calculateHValue(Pair current, Pair dest) {
 }
 
 // This initializes each node of the grid
-void initNodes(int * grid, Node * details, Pair src, int row, int col) {
+void initNodes(int * grid, Node * details, Pair src) {
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
             if ((rand() & 1) | (rand() & 1)) { // gives 1 with probability of 75%, gives 0 with probability of 25%
@@ -116,7 +118,7 @@ void initNodes(int * grid, Node * details, Pair src, int row, int col) {
     }
 }
 
-void readMatrix(int * grid, Node * details, Pair src, int row, int col) {
+void readMatrix(int * grid, Node * details, Pair src) {
 	printf("Reading the file...\n");
 	FILE * f;
 	f = fopen("matrix.txt","r");
@@ -194,7 +196,7 @@ void swap(Pair * array, int l, int r) {
 }
 
 // (Source wikiversity) This orders the array in decrescent order wrt the cost f
-void quickSort(Pair * array, Node * details, int begin, int end, int row) {
+void quickSort(Pair * array, Node * details, int begin, int end) {
     float pivot;
     int l, r;
     if (end > begin) {
@@ -210,8 +212,8 @@ void quickSort(Pair * array, Node * details, int begin, int end, int row) {
             }
         l--;
         swap(array, begin, l);
-        quickSort(array, details, begin, l, row);
-        quickSort(array, details, r, end, row);
+        quickSort(array, details, begin, l);
+        quickSort(array, details, r, end);
     }
 }
 
@@ -243,7 +245,7 @@ void quickSort(Pair * array, Node * details, int begin, int end, int row) {
 // }
 
 // This prints and returns the path that has been eventually found (NOT THE MAP)
-Pair * printPath(Node * details, Pair dst, int * cPath, int row) {
+Pair * printPath(Node * details, Pair dst, int * cPath) {
     int dim = 1;
     int count = * cPath;
     Pair current = dst;
@@ -264,7 +266,7 @@ Pair * printPath(Node * details, Pair dst, int * cPath, int row) {
 }
 
 // A* algorithm main function
-void aStarSearch(int * grid, Node * details, Pair src, Pair dst, int row, int col) {
+void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
     int dimOpen = 1;
     int dimClosed = 1;
     int countOpen = 0;
@@ -283,11 +285,11 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst, int row, int co
 
     // While openList is not empty, do this
     while (countOpen != 0) {
-        quickSort(openList, details, 0, countOpen - 1, row);
+        quickSort(openList, details, 0, countOpen - 1);
         q = openList[0];
         rmNode(openList, 0, & countOpen);
         addNode( & closedList, q, & countClosed, & dimClosed);
-        nearNodes = setNearNodes(grid, q, & c, row, col);
+        nearNodes = setNearNodes(grid, q, & c);
 
         for (int i = 0; i < c; i++) {
             if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
@@ -296,7 +298,7 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst, int row, int co
                 printf("ARRIVED! YUHUUU!\n");
                 printf("Cost: %.3f\n", details[q.x*row + q.y].g + 1);
                 int cPath = 0;
-                Pair * path = printPath(details, dst, & cPath, row);
+                Pair * path = printPath(details, dst, & cPath);
                 //printMap(grid, details, path, cPath);
 
                 free(path);
@@ -333,8 +335,8 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst, int row, int co
 
 int main(int argc, char * argv[]) {
     if (argc >= 7) {
-        int row = atoi(argv[5]);
-        int col = atoi(argv[6]);
+        row = atoi(argv[5]);
+        col = atoi(argv[6]);
         Pair src = {
             atoi(argv[1]),
             atoi(argv[2])
@@ -355,15 +357,15 @@ int main(int argc, char * argv[]) {
         Node *  details = malloc(row*col * sizeof(Node));
         srand(time(0));
         if(DEBUG)
-        	readMatrix(grid, details, src, row, col);
+        	readMatrix(grid, details, src);
         else{
-	        initNodes(grid, details, src, row, col);
+	        initNodes(grid, details, src);
 	        while (grid[(src.x*row) + src.y] == BLOCK_NODE || grid[(dst.x*row) + dst.y] == BLOCK_NODE) {
-	            initNodes(grid, details, src, row, col);
+	            initNodes(grid, details, src);
 	        }
 		}
         double begin = omp_get_wtime();
-        aStarSearch(grid, details, src, dst, row, col);
+        aStarSearch(grid, details, src, dst);
         double end = omp_get_wtime();
         printf("Time: %f (s)\n", end-begin);
         free(grid);
