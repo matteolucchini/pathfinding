@@ -385,7 +385,8 @@ int main(int argc, char * argv[]) {
         else{
 	        initNodes(grid, details, src);
 	        while (grid[(src.x*row) + src.y] == BLOCK_NODE || grid[(dst.x*row) + dst.y] == BLOCK_NODE) {
-	            initNodes(grid, details, src);
+	            printf("Map not feasible!\n");
+                initNodes(grid, details, src);
 	        }
 		}
         printf("Start!\n");
