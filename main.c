@@ -57,18 +57,6 @@ Pair * setNearNodes(int * grid, Pair q, int * c) {
 }
 
 // This checks if a node is inside a list
-// bool isInList(Pair node, Pair * list, int counter) {
-//     bool t = false;
-//     omp_set_num_threads(8);
-//     #pragma omp parallel
-//     {
-//         for (int i = 0; i < counter; i++) {
-//             if (list[i].x == node.x && list[i].y == node.y)
-//                 t = true;
-//         }
-//     }
-//     return t;
-// }
 bool isInList(Pair node, Pair * list, int counter) {
     for (int i = 0; i < counter; i++) {
         if (list[i].x == node.x && list[i].y == node.y)
@@ -132,6 +120,7 @@ void initNodes(int * grid, Node * details, Pair src) {
     printf("Done!\n");
 }
 
+// Read matrix from file
 void readMatrix(int * grid, Node * details, Pair src) {
 	printf("Reading the file...\n");
 	FILE * f;
@@ -151,15 +140,6 @@ void readMatrix(int * grid, Node * details, Pair src) {
 		c = fgetc(f);
 	}
 	fclose(f);
-	
-	/*
-	for (int i = 0; i < ROW; i++) {
-        for (int j = 0; j < COL; j++) {
-        	printf("%d",grid[i*ROW + j]);
-		}
-		printf("\n");
-	}
-	*/
 	printf("Done!\n");	
 	
 	
@@ -234,7 +214,7 @@ void quickSort(Pair * array, Node * details, int begin, int end) {
 }
 
 // This prints just the map
-// Abbandoned, since we are dealing with really big matrices. So it is obsolete and may not work
+// Abandoned, since we are dealing with really big matrices. So it is obsolete and may not work
 // void printMap(int * grid, Pair * path, int cPath) {
 //     Pair tmp;
 // 	char * map = malloc((ROW*COL+ROW+1)*sizeof(char));
