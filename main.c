@@ -6,10 +6,9 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define TASK_SIZE 100
-#define DEBUG false
+#define READ false 		// Set this to true if you want to read the matrix from a file "matrix.txt".
 #define BLOCK_NODE 0
-#define N_DIRECTION 8   // This project was thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
+#define N_DIRECTION 8   // This project is thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
 
 // Definition of the structure of a pair
@@ -41,7 +40,7 @@ Pair * setNearNodes(int * grid, Pair q, int * c) {
     for (int i = x; i <= x + 2; i++) {
         for (int j = y; j <= y + 2; j++) {
             if ((i >= 0 && i < col) && (j >= 0 && j < row)) {
-                if (!(i == q.x && j == q.y) && grid[i*row + j] == 1) {
+                if (!(i == q.x && j == q.y) && grid[i * row + j] == 1) {
                     Pair tmp = {
                         i,
                         j
@@ -91,27 +90,28 @@ void initGrid(int * grid) {
     #pragma omp parallel for
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < col; j++) {
-        	// Gives 1 with probability of 75%
+            // Gives 1 with probability of 75%
             if ((rand() & 1) | (rand() & 1)) {
-                grid[i*row + j] = 1;
+                grid[i * row + j] = 1;
             }
         }
     }
 }
 
 // This initializes each node of the grid
-void initNodes(int * grid, Node * details, Pair src){
-	#pragma omp parallel for
+void initNodes(int * grid, Node * details, Pair src) {
+    #pragma omp parallel for
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < row; j++) {
-            int tmp = i*row + j;
-            if (grid[i*row + j]) {
+            int tmp = i * row + j;
+            if (grid[i * row + j]) {
                 if (i == src.x && j == src.y) {
                     details[tmp].g = 0;
                     details[tmp].h = 0;
                     details[tmp].f = 0;
                     details[tmp].parent = (Pair) {
-                        i, j
+                        i,
+                        j
                     };
 
                 } else {
@@ -124,32 +124,32 @@ void initNodes(int * grid, Node * details, Pair src){
                 }
             }
             details[tmp].x = i;
-            details[tmp].y = j;  
+            details[tmp].y = j;
         }
     }
 }
 
 // Read matrix from file
 void readMatrix(int * grid) {
-	printf("Reading the file for the map... ");
-	FILE * f;
-	f = fopen("matrix.txt","r");
-	int c;
-	int i = 0;
-	int j = 0;
-	c = fgetc(f);
-	while(c != EOF) {
-		if(c != '\n'){
-			grid[i*row + j] = c - 48;
-			j++;
-		} else {
-			i++;
-			j = 0;
-		}
-		c = fgetc(f);
-	}
-	fclose(f);
-    printf("Done!\n");  
+    printf("Reading the file for the map... ");
+    FILE * f;
+    f = fopen("matrix.txt", "r");
+    int c;
+    int i = 0;
+    int j = 0;
+    c = fgetc(f);
+    while (c != EOF) {
+        if (c != '\n') {
+            grid[i * row + j] = c - 48;
+            j++;
+        } else {
+            i++;
+            j = 0;
+        }
+        c = fgetc(f);
+    }
+    fclose(f);
+    printf("Done!\n");
 }
 
 // This "removes" a node in the list, by shifting back all the values after rm_index-th element
@@ -175,11 +175,11 @@ void quickSort(Pair * array, Node * details, int begin, int end) {
     float pivot;
     int l, r;
     if (end > begin) {
-        pivot = details[array[begin].x*row + array[begin].y].f;
+        pivot = details[array[begin].x * row + array[begin].y].f;
         l = begin + 1;
         r = end + 1;
         while (l < r)
-            if (details[array[l].x*row + array[l].y].f < pivot)
+            if (details[array[l].x * row + array[l].y].f < pivot)
                 l++;
             else {
                 r--;
@@ -187,57 +187,53 @@ void quickSort(Pair * array, Node * details, int begin, int end) {
             }
         l--;
         swap(array, begin, l);
-        //#pragma omp task shared(array) if(end - begin > TASK_SIZE)
         quickSort(array, details, begin, l);
-        //#pragma omp task shared(array) if(end - begin > TASK_SIZE)
         quickSort(array, details, r, end);
     }
 }
 
 // This prints just the map
-// Abandoned, since we are dealing with really big matrices. So it is obsolete and may not work
-// void printMap(int * grid, Pair * path, int cPath) {
-//     Pair tmp;
-// 	char * map = malloc((ROW*COL+ROW+1)*sizeof(char));
-//     int c = 0;
-//     for (int i = 0; i < ROW; i++) {
-//         for (int j = 0; j < COL; j++) {
-//             if (grid[i*ROW + j] == 0) 
-//                 map[c] = 0xdb;
-//             else {
-//                 tmp = (Pair) {
-//                     i,
-//                     j
-//                 };
-//                 if (path!=NULL && isInList(tmp, path, cPath)) map[c] = 'x';
-//                 else map[c] = '.';
-//             }
-//             c++;
-//         }
-//         map[c] = '\n';
-//         c++;
-//     }
-	
-// 	map[c] = '\0';
-//     printf("%s", map);
-// }
+// Abandoned, since we are dealing with really big matrices. 
+// So it is obsolete and may not work if used.
+void printMap(int * grid, Pair * path, int cPath) {
+    Pair tmp;
+    char * map = malloc((row * col + row + 1) * sizeof(char));
+    int c = 0;
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            if (grid[i * row + j] == 0)
+                map[c] = 0xdb;
+            else {
+                tmp = (Pair) {
+                    i,
+                    j
+                };
+                if (path != NULL && isInList(tmp, path, cPath)) map[c] = 'x';
+                else map[c] = '.';
+            }
+            c++;
+        }
+        map[c] = '\n';
+        c++;
+    }
+    map[c] = '\0';
+    printf("%s", map);
+}
 
 // This prints and returns the path that has been eventually found (NOT THE MAP)
+// Abandoned, since we are dealing with really big matrices. 
+// So it is obsolete and may not work if used.
 Pair * printPath(Node * details, Pair dst, int * cPath) {
     int dim = 1;
     int count = * cPath;
     Pair current = dst;
     Pair * path = malloc(dim * sizeof(Pair));
     addNode( & path, current, & count, & dim);
-    while (!(current.x == details[current.x*row + current.y].parent.x && current.y == details[current.x*row + current.y].parent.y)) {
-        current = details[current.x*row + current.y].parent;
+    int tmp = current.x * row + current.y;
+    while (!(current.x == details[tmp].parent.x && current.y == details[tmp].parent.y)) {
+        current = details[tmp].parent;
         addNode( & path, current, & count, & dim);
     }
-
-    /*printf("Chosen path:\n");
-    for (int i = count - 1; i >= 0; i--) {
-        printf("\t(%d, %d)\n", path[i].x, path[i].y);
-    }*/
 
     * cPath = count;
     return path;
@@ -245,38 +241,33 @@ Pair * printPath(Node * details, Pair dst, int * cPath) {
 
 // A* algorithm main function
 void aStarSearch(int * grid, Pair src, Pair dst) {
-
-    // Pair * openList = malloc(dimOpen * sizeof(Pair));
-    // Pair * closedList = malloc(dimClosed * sizeof(Pair));
     Pair * nearNodes = NULL;
-    
     int c = 0;
     nearNodes = setNearNodes(grid, src, & c);
     Node * details[c];
     Pair src_new[c];
     printf("Initializing the nodes for each thread... ");
     #pragma omp parallel for
-    for(int i = 0; i < c; i++) {
-        details[i] = malloc(row*col * sizeof(Node));
-		src_new[i] = nearNodes[i];
+    for (int i = 0; i < c; i++) {
+        details[i] = malloc(row * col * sizeof(Node));
+        src_new[i] = nearNodes[i];
         initNodes(grid, details[i], src_new[i]);
     }
     printf("Done!\n");
     free(nearNodes);
-    //addNode( & openList, src, & countOpen, & dimOpen);
 
-	printf("Start!\n");
-	double begin = omp_get_wtime();
-	
+    printf("Start!\n");
+    double begin = omp_get_wtime();
+
     // Opens a parallel region
-    #pragma omp parallel
+    #pragma omp parallel 
     {
         // Let one thread create all the eventual threads 
-        #pragma omp single nowait
+        #pragma omp single nowait 
         {
-            for (int j = 0; j < c; j++){
+            for (int j = 0; j < c; j++) {
                 // Create thread for each node in nearNodes
-                #pragma omp task
+                #pragma omp task 
                 {
                     int dimOpen = 1;
                     int dimClosed = 1;
@@ -289,7 +280,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                     double begin;
                     double end;
                     bool found = false;
-                    Node * details_ptr = details[j];             
+                    Node * details_ptr = details[j];
                     Pair * nearNodes = NULL;
                     Pair * openList = malloc(dimOpen * sizeof(Pair));
                     Pair * closedList = malloc(dimClosed * sizeof(Pair));
@@ -298,9 +289,9 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                     begin = omp_get_wtime();
                     // While openList is not empty, do this
                     while (countOpen != 0) {
-                    	// Can't make respect it in the while. Am I missing something?
-                    	if (found) break; 
-						quickSort(openList, details_ptr, 0, countOpen - 1);
+                        // Can't make respect this bool in the while. Am I missing something?
+                        if (found) break;
+                        quickSort(openList, details_ptr, 0, countOpen - 1);
                         q = openList[0];
                         rmNode(openList, 0, & countOpen);
                         addNode( & closedList, q, & countClosed, & dimClosed);
@@ -309,26 +300,22 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                         for (int i = 0; i < c; i++) {
                             if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
                                 addNode( & closedList, dst, & countClosed, & dimClosed);
-                                details_ptr[dst.x*row + dst.y].parent = q;
+                                details_ptr[dst.x * row + dst.y].parent = q;
                                 end = omp_get_wtime();
-                                printf("Thread %d: path found! \t Time: %fs \t Cost: %.3f\n", omp_get_thread_num(), end-begin, details_ptr[q.x*row + q.y].g + 2);
+                                printf("Thread %d: path found! \t Time: %fs \t Cost: %.3f\n", omp_get_thread_num(), end - begin, details_ptr[q.x * row + q.y].g + 2);
                                 found = true;
-                                //int cPath = 0;
-                                //Pair * path = printPath(details, dst, & cPath);
-                                //printMap(grid, details, path, cPath);
-                                //free(path);
                             }
                             if (!isInList(nearNodes[i], closedList, countClosed)) {
-                                gNew = details_ptr[q.x*row + q.y].g + 1.0;
+                                gNew = details_ptr[q.x * row + q.y].g + 1.0;
                                 hNew = calculateHValue(nearNodes[i], dst);
                                 fNew = gNew + hNew;
-                                if (details_ptr[nearNodes[i].x*row + nearNodes[i].y].f == FLT_MAX || details_ptr[nearNodes[i].x*row + nearNodes[i].y].f > fNew) {
+                                if (details_ptr[nearNodes[i].x * row + nearNodes[i].y].f == FLT_MAX || details_ptr[nearNodes[i].x * row + nearNodes[i].y].f > fNew) {
                                     addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
-
-                                    details_ptr[nearNodes[i].x*row + nearNodes[i].y].f = fNew;
-                                    details_ptr[nearNodes[i].x*row + nearNodes[i].y].g = gNew;
-                                    details_ptr[nearNodes[i].x*row + nearNodes[i].y].h = hNew;
-                                    details_ptr[nearNodes[i].x*row + nearNodes[i].y].parent = q;
+                                    int tmp = nearNodes[i].x * row + nearNodes[i].y;
+                                    details_ptr[tmp].f = fNew;
+                                    details_ptr[tmp].g = gNew;
+                                    details_ptr[tmp].h = hNew;
+                                    details_ptr[tmp].parent = q;
                                 }
                             }
                         }
@@ -337,10 +324,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                     }
                     end = omp_get_wtime();
                     if (countOpen == 0)
-                        printf("Thread %d: path not found... \t Time: %fs\n", omp_get_thread_num(), end-begin);
-                    //printf("Impossible to reach the destination!\n");
-                    //printMap(grid, details, NULL, 0);
-                    putchar('\a'); // funny thing
+                        printf("Thread %d: path not found... \t Time: %fs\n", omp_get_thread_num(), end - begin);
                     free(openList);
                     free(closedList);
                     free(nearNodes);
@@ -350,13 +334,18 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
         }
     } // Implicit barrier
     double end = omp_get_wtime();
-    printf("Finish!\nTotal time: %f (s)\n", end-begin);
+    printf("Finish!\nTotal time: %f (s)\n", end - begin);
+    putchar('\a'); // funny, but useful, thing
 }
 
 int main(int argc, char * argv[]) {
-    omp_set_dynamic(0);                         // Explicitly disable dynamic teams
+    omp_set_dynamic(0); // Explicitly disable dynamic teams
     if (argc >= 8) {
-    	omp_set_num_threads(atoi(argv[7]));         // Use N threads for all parallel regions
+        if (atoi(argv[7]) <= 0) {
+            printf("Not a valid number for threads.\n");
+            return 5;
+        }
+        omp_set_num_threads(atoi(argv[7])); // Use N threads for all parallel regions
         row = atoi(argv[5]);
         col = atoi(argv[6]);
         Pair src = {
@@ -375,25 +364,22 @@ int main(int argc, char * argv[]) {
             printf("Wrong starting or destination node.\n");
             return 3;
         }
-        int * grid = calloc(row*col, sizeof(int));
-        Node *  details = malloc(row*col * sizeof(Node));
+        int * grid = calloc(row * col, sizeof(int));
         srand(time(0));
-        if(DEBUG){
-        	readMatrix(grid);
-        	if (grid[(src.x*row) + src.y] == BLOCK_NODE || grid[(dst.x*row) + dst.y] == BLOCK_NODE){
-        			printf("Map not feasible!\n");
-        			return 4;
-        		}
-		} else {
-    		printf("Generating map... ");
-	        initNodes(grid, details, src);
-	        while (grid[(src.x*row) + src.y] == BLOCK_NODE || grid[(dst.x*row) + dst.y] == BLOCK_NODE)
+        if (READ) {
+            readMatrix(grid);
+            if (grid[(src.x * row) + src.y] == BLOCK_NODE || grid[(dst.x * row) + dst.y] == BLOCK_NODE) {
+                printf("Map not feasible!\n");
+                return 4;
+            }
+        } else {
+            printf("Generating map... ");
+            while (grid[(src.x * row) + src.y] == BLOCK_NODE || grid[(dst.x * row) + dst.y] == BLOCK_NODE)
                 initGrid(grid);
             printf("Done!\n");
-		}
+        }
         aStarSearch(grid, src, dst);
         free(grid);
-        free(details);
         return 0;
     } else {
         printf("Wrong parameters.\n");
