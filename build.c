@@ -12,7 +12,7 @@ void buildMatrix(int row, int col) {
 		srand(time(0));
 		for (int i = 0; i < row; i++) {
 	        for (int j = 0; j < col; j++) {
-	            if ((rand() & 1) | (rand() & 1)) {
+	            if (rand() & 1) {
 	            	fprintf(file, "%d", 1);
 	            } else {
 	            	fprintf(file, "%d", 0);
