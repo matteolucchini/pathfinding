@@ -99,20 +99,17 @@ void initGrid(int * grid) {
 }
 
 // This initializes each node of the grid
-void initNodes(int * grid, Node * details, Pair src) {
+void initNodes(int * grid, Node * details, Pair src_new, Pair src) {
     #pragma omp parallel for
     for (int i = 0; i < row; i++) {
         for (int j = 0; j < row; j++) {
             int tmp = i * row + j;
             if (grid[i * row + j]) {
-                if (i == src.x && j == src.y) {
-                    details[tmp].g = 0;
+                if (i == src_new.x && j == src_new.y) {
+                    details[tmp].g = 1;
                     details[tmp].h = 0;
                     details[tmp].f = 0;
-                    details[tmp].parent = (Pair) {
-                        i,
-                        j
-                    };
+                    details[tmp].parent = src;
 
                 } else {
                     details[tmp].g = FLT_MAX;
@@ -251,7 +248,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
     for (int i = 0; i < c; i++) {
         details[i] = malloc(row * col * sizeof(Node));
         src_new[i] = nearNodes[i];
-        initNodes(grid, details[i], src_new[i]);
+        initNodes(grid, details[i], src_new[i], src);
     }
     printf("Done!\n");
     free(nearNodes);
@@ -285,6 +282,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                     Pair * openList = malloc(dimOpen * sizeof(Pair));
                     Pair * closedList = malloc(dimClosed * sizeof(Pair));
                     Pair q;
+					addNode( & closedList, src, & countClosed, & dimClosed);
                     addNode( & openList, src_new[j], & countOpen, & dimOpen);
                     begin = omp_get_wtime();
                     // While openList is not empty, do this
@@ -302,20 +300,21 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                                 addNode( & closedList, dst, & countClosed, & dimClosed);
                                 details_ptr[dst.x * row + dst.y].parent = q;
                                 end = omp_get_wtime();
-                                printf("Thread %d: path found! \t Time: %fs \t Cost: %.3f\n", omp_get_thread_num(), end - begin, details_ptr[q.x * row + q.y].g + 2);
+                                printf("Thread %d: path found! \t Time: %f (s) \t Cost: %.3f\n", omp_get_thread_num(), end - begin, details_ptr[q.x * row + q.y].g + 1);
                                 found = true;
                             }
                             if (!isInList(nearNodes[i], closedList, countClosed)) {
                                 gNew = details_ptr[q.x * row + q.y].g + 1.0;
                                 hNew = calculateHValue(nearNodes[i], dst);
                                 fNew = gNew + hNew;
-                                if (details_ptr[nearNodes[i].x * row + nearNodes[i].y].f == FLT_MAX || details_ptr[nearNodes[i].x * row + nearNodes[i].y].f > fNew) {
+                                int tmp = nearNodes[i].x * row + nearNodes[i].y;
+                                if (details_ptr[tmp].f == FLT_MAX || details_ptr[tmp].f > fNew) {
                                     addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
-                                    int tmp = nearNodes[i].x * row + nearNodes[i].y;
-                                    details_ptr[tmp].f = fNew;
-                                    details_ptr[tmp].g = gNew;
-                                    details_ptr[tmp].h = hNew;
-                                    details_ptr[tmp].parent = q;
+                                    int tmp2 = nearNodes[i].x * row + nearNodes[i].y;
+                                    details_ptr[tmp2].f = fNew;
+                                    details_ptr[tmp2].g = gNew;
+                                    details_ptr[tmp2].h = hNew;
+                                    details_ptr[tmp2].parent = q;
                                 }
                             }
                         }
@@ -334,8 +333,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
         }
     } // Implicit barrier
     double end = omp_get_wtime();
-    printf("Finish!\nTotal time: %f (s)\n", end - begin);
-    putchar('\a'); // funny, but useful, thing
+    printf("Finish!\nTotal time: %f (s)\n\a", end - begin);
 }
 
 int main(int argc, char * argv[]) {
