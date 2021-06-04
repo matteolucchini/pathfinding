@@ -282,7 +282,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                     Pair * openList = malloc(dimOpen * sizeof(Pair));
                     Pair * closedList = malloc(dimClosed * sizeof(Pair));
                     Pair q;
-		    addNode( & closedList, src, & countClosed, & dimClosed);
+                    addNode( & closedList, src, & countClosed, & dimClosed);
                     addNode( & openList, src_new[j], & countOpen, & dimOpen);
                     begin = omp_get_wtime();
                     // While openList is not empty, do this
