@@ -259,7 +259,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
     for(int i = 0; i < c; i++) {
         details[i] = malloc(row*col * sizeof(Node));
 		src_new[i] = nearNodes[i];
-        initNodes(grid, details[i], src);
+        initNodes(grid, details[i], src_new[i]);
     }
     printf("Done!\n");
     free(nearNodes);
@@ -267,6 +267,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
 
 	printf("Start!\n");
 	double begin = omp_get_wtime();
+	
     // Opens a parallel region
     #pragma omp parallel
     {
@@ -288,7 +289,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                     double begin;
                     double end;
                     bool found = false;
-                    Node * details_ptr = details[j];
+                    Node * details_ptr = details[j];             
                     Pair * nearNodes = NULL;
                     Pair * openList = malloc(dimOpen * sizeof(Pair));
                     Pair * closedList = malloc(dimClosed * sizeof(Pair));
@@ -297,10 +298,9 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                     begin = omp_get_wtime();
                     // While openList is not empty, do this
                     while (countOpen != 0) {
-                    	//#pragma omp parallel
-                    	//#pragma omp single
-                    	if(found) break;
-                    	quickSort(openList, details_ptr, 0, countOpen - 1);
+                    	// Can't make respect it in the while. Am I missing something?
+                    	if (found) break; 
+						quickSort(openList, details_ptr, 0, countOpen - 1);
                         q = openList[0];
                         rmNode(openList, 0, & countOpen);
                         addNode( & closedList, q, & countClosed, & dimClosed);
@@ -319,7 +319,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                                 //free(path);
                             }
                             if (!isInList(nearNodes[i], closedList, countClosed)) {
-                                gNew = (details[j])[q.x*row + q.y].g + 1.0;
+                                gNew = details_ptr[q.x*row + q.y].g + 1.0;
                                 hNew = calculateHValue(nearNodes[i], dst);
                                 fNew = gNew + hNew;
                                 if (details_ptr[nearNodes[i].x*row + nearNodes[i].y].f == FLT_MAX || details_ptr[nearNodes[i].x*row + nearNodes[i].y].f > fNew) {
@@ -340,16 +340,15 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
                         printf("Thread %d: path not found... \t Time: %fs\n", omp_get_thread_num(), end-begin);
                     //printf("Impossible to reach the destination!\n");
                     //printMap(grid, details, NULL, 0);
+                    putchar('\a'); // funny thing
                     free(openList);
                     free(closedList);
                     free(nearNodes);
                     free(details_ptr);
-                    putchar('\a'); // funny thing
                 }
             }
         }
-        #pragma omp barrier
-    }
+    } // Implicit barrier
     double end = omp_get_wtime();
     printf("Finish!\nTotal time: %f (s)\n", end-begin);
 }
