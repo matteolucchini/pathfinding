@@ -6,7 +6,7 @@
 #include <string.h>
 #include <float.h>
 #include <omp.h>
-#define READ true 		// Set this to true if you want to read the matrix from a file "matrix.txt".
+#define READ false 		// Set this to true if you want to read the matrix from a file "matrix.txt".
 #define BLOCK_NODE 0
 #define N_DIRECTION 8   // This project is thought with 8 directions in mind, DON'T EDIT THIS VALUE. 
                         // If you really want to edit it anyway, good luck and many sons.
@@ -373,8 +373,11 @@ int main(int argc, char * argv[]) {
             }
         } else {
             printf("Generating map... ");
-            while (grid[(src.x * row) + src.y] == BLOCK_NODE || grid[(dst.x * row) + dst.y] == BLOCK_NODE)
+            while (grid[(src.x * row) + src.y] == BLOCK_NODE || grid[(dst.x * row) + dst.y] == BLOCK_NODE){
+            	free(grid);
+            	grid = calloc(row * col, sizeof(int));
                 initGrid(grid);
+            }
             printf("Done!\n");
         }
         aStarSearch(grid, src, dst);
