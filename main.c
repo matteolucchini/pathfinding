@@ -253,88 +253,92 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
     printf("Done!\n");
     free(nearNodes);
 
-    printf("Start!\n");
-    double begin = omp_get_wtime();
-
-    // Opens a parallel region
-    #pragma omp parallel 
-    {
-        // Let one thread create all the eventual threads 
-        #pragma omp single nowait 
-        {
-            for (int j = 0; j < c; j++) {
-                // Create thread for each node in nearNodes
-                #pragma omp task 
-                {
-                    int dimOpen = 1;
-                    int dimClosed = 1;
-                    int countOpen = 0;
-                    int countClosed = 0;
-                    int c = 0;
-                    float gNew;
-                    float hNew;
-                    float fNew;
-                    double begin;
-                    double end;
-                    bool found = false;
-                    Node * details_ptr = details[j];
-                    Pair * nearNodes = NULL;
-                    Pair * openList = malloc(dimOpen * sizeof(Pair));
-                    Pair * closedList = malloc(dimClosed * sizeof(Pair));
-                    Pair q;
-                    addNode( & closedList, src, & countClosed, & dimClosed);
-                    addNode( & openList, src_new[j], & countOpen, & dimOpen);
-                    begin = omp_get_wtime();
-                    // While openList is not empty, do this
-                    while (countOpen != 0) {
-                        // Can't make respect this bool in the while. Am I missing something?
-                        if (found) break;
-                        quickSort(openList, details_ptr, 0, countOpen - 1);
-                        q = openList[0];
-                        rmNode(openList, 0, & countOpen);
-                        addNode( & closedList, q, & countClosed, & dimClosed);
-                        nearNodes = setNearNodes(grid, q, & c);
-
-                        for (int i = 0; i < c; i++) {
-                            if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
-                                addNode( & closedList, dst, & countClosed, & dimClosed);
-                                details_ptr[dst.x * row + dst.y].parent = q;
-                                end = omp_get_wtime();
-                                printf("Thread %d: path found! \t Time: %f (s) \t Cost: %.3f\n", omp_get_thread_num(), end - begin, details_ptr[q.x * row + q.y].g + 1);
-                                found = true;
-                            }
-                            if (!isInList(nearNodes[i], closedList, countClosed)) {
-                                gNew = details_ptr[q.x * row + q.y].g + 1.0;
-                                hNew = calculateHValue(nearNodes[i], dst);
-                                fNew = gNew + hNew;
-                                int tmp = nearNodes[i].x * row + nearNodes[i].y;
-                                if (details_ptr[tmp].f == FLT_MAX || details_ptr[tmp].f > fNew) {
-                                    addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
-                                    int tmp2 = nearNodes[i].x * row + nearNodes[i].y;
-                                    details_ptr[tmp2].f = fNew;
-                                    details_ptr[tmp2].g = gNew;
-                                    details_ptr[tmp2].h = hNew;
-                                    details_ptr[tmp2].parent = q;
-                                }
-                            }
-                        }
-                        free(nearNodes);
-                        nearNodes = NULL;
-                    }
-                    if (countOpen == 0){
-			end = omp_get_wtime();
-                        printf("Thread %d: path not found... \t Time: %f (s)\n", omp_get_thread_num(), end - begin);
-		    }
-                    free(openList);
-                    free(closedList);
-                    free(nearNodes);
-                    free(details_ptr);
-                }
-            }
-        }
-    } // Implicit barrier
+	if(c!=0){
+	    printf("Start!\n");
+	    double begin = omp_get_wtime();
+	
+	    // Opens a parallel region
+	    #pragma omp parallel 
+	    {
+	        // Let one thread create all the eventual threads 
+	        #pragma omp single nowait 
+	        {
+	            for (int j = 0; j < c; j++) {
+	                // Create thread for each node in nearNodes
+	                #pragma omp task 
+	                {
+	                    int dimOpen = 1;
+	                    int dimClosed = 1;
+	                    int countOpen = 0;
+	                    int countClosed = 0;
+	                    int c = 0;
+	                    float gNew;
+	                    float hNew;
+	                    float fNew;
+	                    double begin;
+	                    double end;
+	                    bool found = false;
+	                    Node * details_ptr = details[j];
+	                    Pair * nearNodes = NULL;
+	                    Pair * openList = malloc(dimOpen * sizeof(Pair));
+	                    Pair * closedList = malloc(dimClosed * sizeof(Pair));
+	                    Pair q;
+	                    addNode( & closedList, src, & countClosed, & dimClosed);
+	                    addNode( & openList, src_new[j], & countOpen, & dimOpen);
+	                    begin = omp_get_wtime();
+	                    // While openList is not empty, do this
+	                    while (countOpen != 0) {
+	                        // Can't make respect this bool in the while. Am I missing something?
+	                        if (found) break;
+	                        quickSort(openList, details_ptr, 0, countOpen - 1);
+	                        q = openList[0];
+	                        rmNode(openList, 0, & countOpen);
+	                        addNode( & closedList, q, & countClosed, & dimClosed);
+	                        nearNodes = setNearNodes(grid, q, & c);
+	
+	                        for (int i = 0; i < c; i++) {
+	                            if (nearNodes[i].x == dst.x && nearNodes[i].y == dst.y) {
+	                                addNode( & closedList, dst, & countClosed, & dimClosed);
+	                                details_ptr[dst.x * row + dst.y].parent = q;
+	                                end = omp_get_wtime();
+	                                printf("Thread %d: path found! \t Time: %f (s) \t Cost: %.3f\n", omp_get_thread_num(), end - begin, details_ptr[q.x * row + q.y].g + 1);
+	                                found = true;
+	                            }
+	                            if (!isInList(nearNodes[i], closedList, countClosed)) {
+	                                gNew = details_ptr[q.x * row + q.y].g + 1.0;
+	                                hNew = calculateHValue(nearNodes[i], dst);
+	                                fNew = gNew + hNew;
+	                                int tmp = nearNodes[i].x * row + nearNodes[i].y;
+	                                if (details_ptr[tmp].f == FLT_MAX || details_ptr[tmp].f > fNew) {
+	                                    addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
+	                                    int tmp2 = nearNodes[i].x * row + nearNodes[i].y;
+	                                    details_ptr[tmp2].f = fNew;
+	                                    details_ptr[tmp2].g = gNew;
+	                                    details_ptr[tmp2].h = hNew;
+	                                    details_ptr[tmp2].parent = q;
+	                                }
+	                            }
+	                        }
+	                        free(nearNodes);
+	                        nearNodes = NULL;
+	                    }
+	                    if (countOpen == 0){
+				end = omp_get_wtime();
+	                        printf("Thread %d: path not found... \t Time: %f (s)\n", omp_get_thread_num(), end - begin);
+			    }
+	                    free(openList);
+	                    free(closedList);
+	                    free(nearNodes);
+	                    free(details_ptr);
+	                }
+	            }
+	        }
+	    } // Implicit barrier
     double end = omp_get_wtime();
     printf("Finish!\nTotal time: %f (s)\n\a", end - begin);
+    } else {
+    	printf("There are no near nodes around the chosen starting node!\n");
+	}
 }
 
 int main(int argc, char * argv[]) {
