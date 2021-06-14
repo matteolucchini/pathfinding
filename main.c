@@ -323,9 +323,9 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
 	                        nearNodes = NULL;
 	                    }
 	                    if (countOpen == 0){
-				end = omp_get_wtime();
+							end = omp_get_wtime();
 	                        printf("Thread %d: path not found... \t Time: %f (s)\n", omp_get_thread_num(), end - begin);
-			    }
+			    		}
 	                    free(openList);
 	                    free(closedList);
 	                    free(nearNodes);
@@ -334,8 +334,8 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
 	            }
 	        }
 	    } // Implicit barrier
-    double end = omp_get_wtime();
-    printf("Finish!\nTotal time: %f (s)\n\a", end - begin);
+	    double end = omp_get_wtime();
+	    printf("Finish!\nTotal time: %f (s)\n\a", end - begin);
     } else {
     	printf("There are no near nodes around the chosen starting node!\n");
 	}
