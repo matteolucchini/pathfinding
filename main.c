@@ -29,6 +29,12 @@ typedef struct node {
 }
 Node;
 
+typedef struct path{
+	double cost;
+	int nThread;
+}
+Path;
+
 int row, col;
 
 // This returns all the neighboring nodes of a given node q
@@ -163,7 +169,7 @@ void rmNode(Pair * list, int rm_index, int * counter) {
 
 void swap(Pair * array, int l, int r) {
     Pair tmp = array[l];
-    array[l] = (array)[r];
+    array[l] = array[r];
     array[r] = tmp;
 }
 
@@ -186,6 +192,33 @@ void quickSort(Pair * array, Node * details, int begin, int end) {
         swap(array, begin, l);
         quickSort(array, details, begin, l);
         quickSort(array, details, r, end);
+    }
+}
+
+void swapPath(Path * array, int l, int r) {
+    Path tmp = array[l];
+    array[l] = array[r];
+    array[r] = tmp;
+}
+
+void quickSortPath(Path * array, int begin, int end) {
+    float pivot;
+    int l, r;
+    if (end > begin) {
+        pivot = array[begin].cost;
+        l = begin + 1;
+        r = end + 1;
+        while (l < r)
+            if (array[l].cost < pivot)
+                l++;
+            else {
+                r--;
+                swapPath(array, l, r);
+            }
+        l--;
+        swapPath(array, begin, l);
+        quickSortPath(array, begin, l);
+        quickSortPath(array, r, end);
     }
 }
 
@@ -254,6 +287,7 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
     free(nearNodes);
 
 	if(c!=0){
+		Path paths[c-1];
 	    printf("Start!\n");
 	    double begin = omp_get_wtime();
 	
@@ -301,7 +335,12 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
 	                                addNode( & closedList, dst, & countClosed, & dimClosed);
 	                                details_ptr[dst.x * row + dst.y].parent = q;
 	                                end = omp_get_wtime();
-	                                printf("Thread %d: path found! \t Time: %f (s) \t Cost: %.3f\n", omp_get_thread_num(), end - begin, details_ptr[q.x * row + q.y].g + 1);
+	                                double cost = details_ptr[q.x * row + q.y].g + 1;
+	                                int nThread = omp_get_thread_num();
+	                                printf("Thread %d: path found! \t Time: %f (s) \t Cost: %.3f\n", nThread, end - begin, cost);
+									paths[j] = (Path) {
+										cost, nThread
+									};
 	                                found = true;
 	                            }
 	                            if (!isInList(nearNodes[i], closedList, countClosed)) {
@@ -324,6 +363,11 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
 	                    }
 	                    if (countOpen == 0){
 							end = omp_get_wtime();
+							double cost = FLT_MAX;
+	                        int nThread = omp_get_thread_num();
+							paths[j] = (Path) {
+								cost, nThread
+							};
 	                        printf("Thread %d: path not found... \t Time: %f (s)\n", omp_get_thread_num(), end - begin);
 			    		}
 	                    free(openList);
@@ -335,9 +379,11 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
 	        }
 	    } // Implicit barrier
 	    double end = omp_get_wtime();
-	    printf("Finish!\nTotal time: %f (s)\n\a", end - begin);
+	    quickSortPath(paths, 0, c-1);
+		printf("Finish!\nThread that found the path with the lowest cost: %d\n", paths[0].nThread);
+	    printf("Total time: %f (s)\n\a", end - begin);
     } else {
-    	printf("There are no near nodes around the chosen starting node!\n");
+    	printf("There are no near nodes around the chosen starting node!\n\a");
 	}
 }
 
