@@ -218,30 +218,30 @@ void quickSort(Pair * array, Node * details, int begin, int end) {
 
 // This prints just the map
 // Abbandoned, since we are dealing with really big matrices. So it is obsolete and may not work
-// void printMap(int * grid, Pair * path, int cPath) {
-//     Pair tmp;
-//     char * map = malloc((ROW*COL+ROW+1)*sizeof(char));
-//     int c = 0;
-//     for (int i = 0; i < ROW; i++) {
-//         for (int j = 0; j < COL; j++) {
-//             if (grid[i*ROW + j] == 0) 
-//                 map[c] = 0xdb;
-//             else {
-//                 tmp = (Pair) {
-//                     i,
-//                     j
-//                 };
-//                 if (path!=NULL && isInList(tmp, path, cPath)) map[c] = 'x';
-//                 else map[c] = '.';
-//             }
-//             c++;
-//         }
-//         map[c] = '\n';
-//         c++;
-//     }
-//     map[c] = '\0';
-//     printf("%s", map);
-// }
+ void printMap(int * grid, Pair * path, int cPath) {
+     Pair tmp;
+     char * map = malloc((row*col+row+1)*sizeof(char));
+     int c = 0;
+     for (int i = 0; i < row; i++) {
+         for (int j = 0; j < col; j++) {
+             if (grid[i*row + j] == 0) 
+                 map[c] = 0xdb;
+             else {
+                 tmp = (Pair) {
+                     i,
+                     j
+                 };
+                 if (path!=NULL && isInList(tmp, path, cPath)) map[c] = 'x';
+                 else map[c] = '.';
+             }
+             c++;
+         }
+         map[c] = '\n';
+         c++;
+     }
+     map[c] = '\0';
+     printf("%s", map);
+ }
 
 // This prints and returns the path that has been eventually found (NOT THE MAP)
 Pair * printPath(Node * details, Pair dst, int * cPath) {
@@ -296,11 +296,11 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
                 details[dst.x*row + dst.y].parent = q;
                 printf("ARRIVED! YUHUUU!\n");
                 printf("Cost: %.3f\n", details[q.x*row + q.y].g + 1);
-                //int cPath = 0;
-                //Pair * path = printPath(details, dst, & cPath);
-                //printMap(grid, details, path, cPath);
+                int cPath = 0;
+                Pair * path = printPath(details, dst, & cPath);
+                printMap(grid, path, cPath);
 
-                //free(path);
+                free(path);
                 free(openList);
                 free(closedList);
                 free(nearNodes);
