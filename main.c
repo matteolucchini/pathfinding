@@ -355,9 +355,13 @@ int main(int argc, char * argv[]) {
         int * grid = calloc(row*col, sizeof(int));
         Node *  details = malloc(row*col * sizeof(Node));
         srand(time(0));
-        if(DEBUG)
+        if(DEBUG){
         	readMatrix(grid, details, src);
-        else{
+        	if (grid[(src.x * row) + src.y] == BLOCK_NODE || grid[(dst.x * row) + dst.y] == BLOCK_NODE) {
+                printf("Map not feasible!\n");
+                return 4;
+            }
+        } else {
 	        initNodes(grid, details, src);
 	        while (grid[(src.x*row) + src.y] == BLOCK_NODE || grid[(dst.x*row) + dst.y] == BLOCK_NODE) {
                 printf("Map not feasible!\n");
