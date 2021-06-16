@@ -325,7 +325,7 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
         nearNodes = NULL;
     }
     printf("Impossible to reach the destination!\n");
-    //printMap(grid, details, NULL, 0);
+    printMap(grid, NULL, 0);
     free(openList);
     free(closedList);
     free(nearNodes);
