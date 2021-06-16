@@ -300,7 +300,7 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
                 //Pair * path = printPath(details, dst, & cPath);
                 //printMap(grid, details, path, cPath);
 
-                free(path);
+                //free(path);
                 free(openList);
                 free(closedList);
                 free(nearNodes);
