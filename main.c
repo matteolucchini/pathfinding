@@ -296,8 +296,8 @@ void aStarSearch(int * grid, Node * details, Pair src, Pair dst) {
                 details[dst.x*row + dst.y].parent = q;
                 printf("ARRIVED! YUHUUU!\n");
                 printf("Cost: %.3f\n", details[q.x*row + q.y].g + 1);
-                int cPath = 0;
-                Pair * path = printPath(details, dst, & cPath);
+                //int cPath = 0;
+                //Pair * path = printPath(details, dst, & cPath);
                 //printMap(grid, details, path, cPath);
 
                 free(path);
