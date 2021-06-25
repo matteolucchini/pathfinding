@@ -342,21 +342,22 @@ void aStarSearch(int * grid, Pair src, Pair dst) {
 										cost, nThread
 									};
 	                                found = true;
-	                            }
-	                            if (!isInList(nearNodes[i], closedList, countClosed)) {
-	                                gNew = details_ptr[q.x * row + q.y].g + 1.0;
-	                                hNew = calculateHValue(nearNodes[i], dst);
-	                                fNew = gNew + hNew;
-	                                int tmp = nearNodes[i].x * row + nearNodes[i].y;
-	                                if (details_ptr[tmp].f == FLT_MAX || details_ptr[tmp].f > fNew) {
-	                                    addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
-	                                    int tmp2 = nearNodes[i].x * row + nearNodes[i].y;
-	                                    details_ptr[tmp2].f = fNew;
-	                                    details_ptr[tmp2].g = gNew;
-	                                    details_ptr[tmp2].h = hNew;
-	                                    details_ptr[tmp2].parent = q;
-	                                }
-	                            }
+	                            } else {
+									if (!isInList(nearNodes[i], closedList, countClosed)) {
+		                                gNew = details_ptr[q.x * row + q.y].g + 1.0;
+		                                hNew = calculateHValue(nearNodes[i], dst);
+		                                fNew = gNew + hNew;
+		                                int tmp = nearNodes[i].x * row + nearNodes[i].y;
+		                                if (details_ptr[tmp].f == FLT_MAX || details_ptr[tmp].f > fNew) {
+		                                    addNode( & openList, nearNodes[i], & countOpen, & dimOpen);
+		                                    int tmp2 = nearNodes[i].x * row + nearNodes[i].y;
+		                                    details_ptr[tmp2].f = fNew;
+		                                    details_ptr[tmp2].g = gNew;
+		                                    details_ptr[tmp2].h = hNew;
+		                                    details_ptr[tmp2].parent = q;
+		                                }
+		                            }
+		                        }
 	                        }
 	                        free(nearNodes);
 	                        nearNodes = NULL;
