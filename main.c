@@ -173,7 +173,7 @@ void swap(Pair * array, int l, int r) {
     array[r] = tmp;
 }
 
-// (Source wikiversity) This orders the array in decrescent order wrt the cost f
+// (Source wikiversity) This orders the array in crescent order wrt the cost f
 void quickSort(Pair * array, Node * details, int begin, int end) {
     float pivot;
     int l, r;
